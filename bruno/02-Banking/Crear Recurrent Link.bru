@@ -1,0 +1,18 @@
+meta {
+  name: Crear Recurrent Link
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/banking/link
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "user-test-001",
+    "authCode": "oauth_code_del_flujo_bancario_aqui"
+  }
+}

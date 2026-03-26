@@ -1,0 +1,19 @@
+meta {
+  name: Verificar Codigo OTP
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/otp/verificar
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "uid": "user-test-001",
+    "otpId": "otp_id_recibido_del_trigger",
+    "codigo": "123456"
+  }
+}

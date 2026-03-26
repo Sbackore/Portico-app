@@ -1,0 +1,23 @@
+meta {
+  name: Enviar Notificacion Push
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/notificaciones/enviar
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "user-test-001",
+    "alertaId": "alerta-test-001",
+    "nivelUrgencia": "ALTA",
+    "monto": "850000",
+    "comercio": "Mercado Libre Colombia",
+    "colorIndicador": "NARANJA",
+    "forzarTodosCanales": false
+  }
+}

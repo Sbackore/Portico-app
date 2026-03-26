@@ -1,0 +1,35 @@
+# Dependencias locales
+node_modules
+
+# Build anterior
+dist
+
+# Variables de entorno — NUNCA subir al contenedor
+.env
+.env.*
+
+# Credenciales de GCP — NUNCA subir al contenedor
+serviceAccountKey.json
+*.json.key
+
+# Archivos de desarrollo
+*.spec.ts
+*.test.ts
+coverage/
+.jest/
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

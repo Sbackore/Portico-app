@@ -1,0 +1,23 @@
+meta {
+  name: Webhook Nueva Transaccion
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/banking/webhook
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "user-test-001",
+    "idTransaccion": "txn-9a3f2b-001",
+    "monto": 850000,
+    "comercio": "Mercado Libre Colombia",
+    "fechaHora": "2026-03-25T23:10:00.000Z",
+    "ubicacion": "Bogotá, Colombia",
+    "factorDispositivo": 0
+  }
+}

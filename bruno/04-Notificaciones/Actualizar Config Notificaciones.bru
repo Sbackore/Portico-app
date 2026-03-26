@@ -1,0 +1,20 @@
+meta {
+  name: Actualizar Config Notificaciones
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/notificaciones/config/user-test-001
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "canalNotificacion": "PUSH",
+    "esObligatoria": true,
+    "agrupable": true,
+    "permisoNotificacionesActivo": true
+  }
+}

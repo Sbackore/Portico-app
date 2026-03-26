@@ -1,0 +1,19 @@
+meta {
+  name: Trigger Verificacion OTP
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/otp/trigger
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "uid": "user-test-001",
+    "nivelRiesgo": "ALTO",
+    "motivo": "Por tu seguridad, enviamos un código de verificación a tu celular registrado. Esto no es un error."
+  }
+}

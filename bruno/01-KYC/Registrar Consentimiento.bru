@@ -1,0 +1,20 @@
+meta {
+  name: Registrar Consentimiento
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/kyc/consentimiento
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "uid": "user-test-001",
+    "version": "2.1.0",
+    "proposito": "Verificación de identidad para apertura de cuenta Pórtico",
+    "dispositivo": "Pixel 7 Pro"
+  }
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Webhook RASP - Amenaza Detectada
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/rasp/webhook
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "user-test-001",
+    "tipoAmenaza": "ROOT",
+    "severidad": "CRITICA",
+    "dispositivo": "Samsung Galaxy S23",
+    "timestampMs": 1774482000000
+  }
+}
