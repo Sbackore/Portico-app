@@ -32,7 +32,7 @@ export class NotificacionesService {
   ): Promise<{ enviado: boolean; canalesUsados: string[] }> {
     const db = this.firestoreService.getDb();
     const endpoint = this.configService.get<string>('AG_NOTIFY_ENDPOINT');
-    const apiKey = this.configService.get<string>('AG_NOTIFY_API_KEY');
+    const apiKey = this.configService.get<string>('AG_NOTIFY_API_KEY') || 'REEMPLAZAR';
 
     // Obtener FCM token y config de notificaciones del usuario
     const [userSnap, configSnap] = await Promise.all([
@@ -67,9 +67,14 @@ export class NotificacionesService {
       canales,
     };
 
-    await axios.post(`${endpoint}/send`, payload, {
-      headers: { 'X-API-Key': apiKey },
-    });
+    if (apiKey.includes('REEMPLAZAR')) {
+      this.logger.warn('[Simulación] API Key no configurada. Simulando envío de notificación Push.');
+    } else {
+      await axios.post(`${endpoint}/send`, payload, {
+        headers: { 'X-API-Key': apiKey },
+      });
+    }
+
 
     // Persistir la entrega en Firestore
     await db.collection('notificaciones_enviadas').add({

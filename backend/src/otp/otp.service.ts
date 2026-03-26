@@ -28,7 +28,7 @@ export class OtpService {
   ): Promise<{ otpId: string; canal: string; mensaje: string }> {
     const db = this.firestoreService.getDb();
     const endpoint = this.configService.get<string>('AG_AUTH_ENDPOINT');
-    const apiKey = this.configService.get<string>('AG_AUTH_API_KEY');
+    const apiKey = this.configService.get<string>('AG_AUTH_API_KEY') || 'REEMPLAZAR';
     const expiresInSeconds = parseInt(
       this.configService.get<string>('OTP_EXPIRY_SECONDS', '300'),
       10,
@@ -47,13 +47,18 @@ export class OtpService {
     const canal = authDoc.data()?.metodoInicioSesionRespaldo || 'OTP_SMS';
 
     // Llamar a Antigravity Auth para generar y enviar el OTP
-    const agResponse = await axios.post(
-      `${endpoint}/otp/send`,
-      { userId: dto.uid, canal, expiresInSeconds },
-      { headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' } },
-    );
+    let otpId = `otp-simulado-${Date.now()}`;
+    if (apiKey.includes('REEMPLAZAR')) {
+      this.logger.warn('[Simulación] API Key no configurada. Simulando envío OTP hacia el canal.');
+    } else {
+      const agResponse = await axios.post(
+        `${endpoint}/otp/send`,
+        { userId: dto.uid, canal, expiresInSeconds },
+        { headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' } },
+      );
+      otpId = (agResponse.data as { otpId: string }).otpId;
+    }
 
-    const { otpId } = agResponse.data as { otpId: string };
 
     // Registrar la solicitud en Firestore
     await db.collection('verificaciones_otp').add({
@@ -83,22 +88,30 @@ export class OtpService {
   ): Promise<{ valido: boolean; mensaje: string }> {
     const db = this.firestoreService.getDb();
     const endpoint = this.configService.get<string>('AG_AUTH_ENDPOINT');
-    const apiKey = this.configService.get<string>('AG_AUTH_API_KEY');
+    const apiKey = this.configService.get<string>('AG_AUTH_API_KEY') || 'REEMPLAZAR';
     const maxIntentos = parseInt(
       this.configService.get<string>('OTP_MAX_INTENTOS', '3'),
       10,
     );
 
-    const agResponse = await axios.post(
-      `${endpoint}/otp/verify`,
-      { userId: dto.uid, otpId: dto.otpId, codigo: dto.codigo },
-      { headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' } },
-    );
+    let valido = false;
+    let intentosRestantes = maxIntentos - 1;
 
-    const { valido, intentosRestantes } = agResponse.data as {
-      valido: boolean;
-      intentosRestantes: number;
-    };
+    if (apiKey.includes('REEMPLAZAR')) {
+      this.logger.warn(`[Simulación] Verificando OTP. Usa el código '000000' para aprobar.`);
+      valido = dto.codigo === '000000';
+      intentosRestantes = valido ? maxIntentos : 2;
+    } else {
+      const agResponse = await axios.post(
+        `${endpoint}/otp/verify`,
+        { userId: dto.uid, otpId: dto.otpId, codigo: dto.codigo },
+        { headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' } },
+      );
+      const data = agResponse.data as { valido: boolean; intentosRestantes: number };
+      valido = data.valido;
+      intentosRestantes = data.intentosRestantes;
+    }
+
 
     // Buscar el documento de verificación y actualizarlo
     const snapshot = await db

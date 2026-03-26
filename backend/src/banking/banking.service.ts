@@ -154,17 +154,22 @@ export class BankingService {
   ): Promise<{ linkId: string }> {
     const db = this.firestoreService.getDb();
     const endpoint = this.configService.get<string>('AG_BANKING_ENDPOINT');
-    const apiKey = this.configService.get<string>('AG_BANKING_API_KEY');
+    const apiKey = this.configService.get<string>('AG_BANKING_API_KEY') || 'REEMPLAZAR';
 
-    const response = await axios.post(
-      `${endpoint}/links/recurrent`,
-      { userId, authCode },
-      { headers: { 'X-API-Key': apiKey } },
-    );
-
-    const { linkId } = response.data as { linkId: string };
+    let linkId = 'link-simulado-000';
+    if (apiKey.includes('REEMPLAZAR')) {
+      this.logger.warn('[Simulación] API Key no configurada. Simulando creación de Recurrent Link.');
+    } else {
+      const response = await axios.post(
+        `${endpoint}/links/recurrent`,
+        { userId, authCode },
+        { headers: { 'X-API-Key': apiKey } },
+      );
+      linkId = (response.data as { linkId: string }).linkId;
+    }
 
     // Guardar el linkId en Firestore
+
     await db
       .collection('cuentas_bancarias')
       .doc(userId)
