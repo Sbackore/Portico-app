@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pórtico — Galería de Mockups</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #080916;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa, #7B5EA7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #0f1022;
+      border: 1px solid #1e2040;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(123, 94, 167, 0.3);
+      border-color: #7B5EA7;
+    }
+
+    .card img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .card-label {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #d1d5db;
+      border-top: 1px solid #1e2040;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .lightbox.active { display: flex; }
+
+    .lightbox img {
+      max-height: 85vh;
+      max-width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 0 80px rgba(123,94,167,0.4);
+    }
+
+    .lightbox-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a78bfa;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: #1e2040;
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .lightbox-close:hover { background: #7B5EA7; }
+
+    .nav-btns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .nav-btns button {
+      background: #1e2040;
+      border: 1px solid #2d3060;
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .nav-btns button:hover { background: #7B5EA7; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🏦 Pórtico — Mockups UI</h1>
+    <p>Galería de pantallas móviles · Haz clic en cualquier imagen para ampliarla</p>
+  </header>
+
+  <div class="gallery" id="gallery">
+    <div class="card" onclick="openLightbox(0)">
+      <img src="portico_home_v2_1775698336992.png" alt="Home" />
+      <div class="card-label">🏠 Home / Dashboard</div>
+    </div>
+    <div class="card" onclick="openLightbox(1)">
+      <img src="portico_kyc_v2_1775698351414.png" alt="KYC" />
+      <div class="card-label">🪪 KYC — Verificación de Identidad</div>
+    </div>
+    <div class="card" onclick="openLightbox(2)">
+      <img src="portico_otp_v2_1775698364868.png" alt="OTP" />
+      <div class="card-label">🔐 OTP — Código de Verificación</div>
+    </div>
+    <div class="card" onclick="openLightbox(3)">
+      <img src="portico_banking_v2_1775698379185.png" alt="Banking" />
+      <div class="card-label">🏦 Banking — Alertas de Transacciones</div>
+    </div>
+    <div class="card" onclick="openLightbox(4)">
+      <img src="portico_rasp_v2_1775698395690.png" alt="RASP" />
+      <div class="card-label">🛡️ RASP — Seguridad</div>
+    </div>
+    <div class="card" onclick="openLightbox(5)">
+      <img src="portico_notifications_v2_1775698411350.png" alt="Notificaciones" />
+      <div class="card-label">🔔 Notificaciones</div>
+    </div>
+    <div class="card" onclick="openLightbox(6)">
+      <img src="portico_error_states_v2_1775698424327.png" alt="Errores" />
+      <div class="card-label">⚠️ Estados de Error</div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+    <div class="lightbox-label" id="lightbox-label"></div>
+    <div class="nav-btns">
+      <button onclick="navigate(-1); event.stopPropagation()">← Anterior</button>
+      <button onclick="navigate(1); event.stopPropagation()">Siguiente →</button>
+    </div>
+  </div>
+
+  <script>
+    const screens = [
+      { src: 'portico_home_v2_1775698336992.png', label: '🏠 Home / Dashboard' },
+      { src: 'portico_kyc_v2_1775698351414.png', label: '🪪 KYC — Verificación de Identidad' },
+      { src: 'portico_otp_v2_1775698364868.png', label: '🔐 OTP — Código de Verificación' },
+      { src: 'portico_banking_v2_1775698379185.png', label: '🏦 Banking — Alertas de Transacciones' },
+      { src: 'portico_rasp_v2_1775698395690.png', label: '🛡️ RASP — Seguridad' },
+      { src: 'portico_notifications_v2_1775698411350.png', label: '🔔 Notificaciones' },
+      { src: 'portico_error_states_v2_1775698424327.png', label: '⚠️ Estados de Error' },
+    ];
+
+    let current = 0;
+
+    function openLightbox(index) {
+      current = index;
+      document.getElementById('lightbox-img').src = screens[index].src;
+      document.getElementById('lightbox-label').textContent = screens[index].label;
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox(e) {
+      if (!e || e.target === document.getElementById('lightbox') || e.currentTarget.classList.contains('lightbox-close')) {
+        document.getElementById('lightbox').classList.remove('active');
+      }
+    }
+
+    function navigate(dir) {
+      current = (current + dir + screens.length) % screens.length;
+      openLightbox(current);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox({ target: document.getElementById('lightbox') });
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
+    });
+  </script>
+
+</body>
+</html>
