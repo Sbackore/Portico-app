@@ -76,12 +76,19 @@ export class NotificacionesService {
     }
 
 
-    // Persistir la entrega en Firestore
-    await db.collection('notificaciones_enviadas').add({
-      ...payload,
-      enviadaEn: FieldValue.serverTimestamp(),
-      estado: 'ENTREGADA',
-    });
+    // Persistir la entrega en Firestore (solo cuando la API real está activa)
+    if (!apiKey.includes('REEMPLAZAR')) {
+      await db.collection('notificaciones_enviadas').add({
+        ...payload,
+        enviadaEn: FieldValue.serverTimestamp(),
+        estado: 'ENTREGADA',
+      });
+    } else {
+      this.logger.log(
+        `[Simulación] Notificación registrada solo en log (BD no disponible en modo prueba).`,
+      );
+    }
+
 
     this.logger.log(
       `Notificación enviada a ${dto.userId}: nivel=${dto.nivelUrgencia}, canales=${canales.join(',')}`,

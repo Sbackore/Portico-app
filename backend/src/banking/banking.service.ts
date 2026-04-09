@@ -71,12 +71,14 @@ export class BankingService {
     });
 
     // 2. Obtener historial reciente del usuario (últimas 30 txns)
+    // NOTA: Se omite .orderBy() para no requerir índice compuesto en Firestore.
+    // El ordenamiento por fechaHora se hace en memoria tras el fetch.
     const historial = await db
       .collection('transacciones_raw')
       .where('userId', '==', dto.userId)
-      .orderBy('fechaHora', 'desc')
       .limit(30)
       .get();
+
 
     // Calcular promedio histórico de montos
     let totalMonto = 0;

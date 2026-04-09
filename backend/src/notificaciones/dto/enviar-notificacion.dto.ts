@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean, IsOptional, IsNumber } from 'class-validator';
 
 export class EnviarNotificacionDto {
   @IsString()
@@ -13,9 +13,9 @@ export class EnviarNotificacionDto {
   @IsNotEmpty()
   nivelUrgencia: string;
 
-  @IsString()
-  @IsNotEmpty()
-  monto: string;
+  @IsNumber()
+  monto: number;
+
 
   @IsString()
   @IsNotEmpty()

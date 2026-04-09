@@ -1,0 +1,465 @@
+{
+  "timestamp": "2026-04-09T01:12:37.044Z",
+  "passed": 34,
+  "failed": 0,
+  "total": 34,
+  "results": [
+    {
+      "testName": "KYC-01 | Consentimiento OK (201)",
+      "method": "POST",
+      "path": "/api/kyc/consentimiento",
+      "expectedStatus": 201,
+      "actualStatus": 201,
+      "ok": true,
+      "responseBody": {
+        "success": true
+      }
+    },
+    {
+      "testName": "KYC-02 | Sin uid (400)",
+      "method": "POST",
+      "path": "/api/kyc/consentimiento",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "uid should not be empty; uid must be a string",
+        "path": "/api/kyc/consentimiento",
+        "timestamp": "2026-04-09T01:12:29.179Z"
+      }
+    },
+    {
+      "testName": "KYC-03 | Body vacío (400)",
+      "method": "POST",
+      "path": "/api/kyc/consentimiento",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "uid should not be empty; uid must be a string; version should not be empty; version must be a string; proposito should not be empty; proposito must be a string; dispositivo should not be empty; dispositivo must be a string",
+        "path": "/api/kyc/consentimiento",
+        "timestamp": "2026-04-09T01:12:29.307Z"
+      }
+    },
+    {
+      "testName": "KYC-04 | Campo extra no permitido (400)",
+      "method": "POST",
+      "path": "/api/kyc/consentimiento",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "property campoExtra should not exist",
+        "path": "/api/kyc/consentimiento",
+        "timestamp": "2026-04-09T01:12:29.420Z"
+      }
+    },
+    {
+      "testName": "KYC-05 | Webhook APROBADO (200)",
+      "method": "POST",
+      "path": "/api/kyc/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "received": true
+      }
+    },
+    {
+      "testName": "KYC-06 | Webhook RECHAZADO (200)",
+      "method": "POST",
+      "path": "/api/kyc/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "received": true
+      }
+    },
+    {
+      "testName": "KYC-07 | Webhook sin userId (400)",
+      "method": "POST",
+      "path": "/api/kyc/webhook",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string",
+        "path": "/api/kyc/webhook",
+        "timestamp": "2026-04-09T01:12:33.104Z"
+      }
+    },
+    {
+      "testName": "BANK-01 | Webhook transacción OK (200)",
+      "method": "POST",
+      "path": "/api/banking/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "processed": true,
+        "score": 15
+      }
+    },
+    {
+      "testName": "BANK-02 | Webhook faltan campos (400)",
+      "method": "POST",
+      "path": "/api/banking/webhook",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "idTransaccion should not be empty; idTransaccion must be a string; comercio should not be empty; comercio must be a string; fechaHora should not be empty; fechaHora must be a string",
+        "path": "/api/banking/webhook",
+        "timestamp": "2026-04-09T01:12:33.616Z"
+      }
+    },
+    {
+      "testName": "BANK-03 | Webhook body vacío (400)",
+      "method": "POST",
+      "path": "/api/banking/webhook",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string; idTransaccion should not be empty; idTransaccion must be a string; monto must be a number conforming to the specified constraints; comercio should not be empty; comercio must be a string; fechaHora should not be empty; fechaHora must be a string",
+        "path": "/api/banking/webhook",
+        "timestamp": "2026-04-09T01:12:33.735Z"
+      }
+    },
+    {
+      "testName": "BANK-04 | Recurrent Link simulado (201)",
+      "method": "POST",
+      "path": "/api/banking/link",
+      "expectedStatus": 201,
+      "actualStatus": 201,
+      "ok": true,
+      "responseBody": {
+        "linkId": "link-simulado-000"
+      }
+    },
+    {
+      "testName": "BANK-05 | Link sin authCode (400)",
+      "method": "POST",
+      "path": "/api/banking/link",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "authCode should not be empty; authCode must be a string",
+        "path": "/api/banking/link",
+        "timestamp": "2026-04-09T01:12:34.129Z"
+      }
+    },
+    {
+      "testName": "BANK-06 | Link body vacío (400)",
+      "method": "POST",
+      "path": "/api/banking/link",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string; authCode should not be empty; authCode must be a string",
+        "path": "/api/banking/link",
+        "timestamp": "2026-04-09T01:12:34.292Z"
+      }
+    },
+    {
+      "testName": "OTP-01 | Trigger ALTO (201)",
+      "method": "POST",
+      "path": "/api/otp/trigger",
+      "expectedStatus": 201,
+      "actualStatus": 201,
+      "ok": true,
+      "responseBody": {
+        "otpId": "otp-simulado-1775697154453",
+        "canal": "OTP_SMS",
+        "mensaje": "Transacción sospechosa"
+      }
+    },
+    {
+      "testName": "OTP-02 | Trigger CRÍTICO (201)",
+      "method": "POST",
+      "path": "/api/otp/trigger",
+      "expectedStatus": 201,
+      "actualStatus": 201,
+      "ok": true,
+      "responseBody": {
+        "otpId": "otp-simulado-1775697154735",
+        "canal": "OTP_SMS",
+        "mensaje": "Acceso desconocido"
+      }
+    },
+    {
+      "testName": "OTP-03 | Trigger MEDIO (201)",
+      "method": "POST",
+      "path": "/api/otp/trigger",
+      "expectedStatus": 201,
+      "actualStatus": 201,
+      "ok": true,
+      "responseBody": {
+        "otpId": "otp-simulado-1775697154968",
+        "canal": "OTP_SMS",
+        "mensaje": "Nuevo dispositivo"
+      }
+    },
+    {
+      "testName": "OTP-04 | Trigger sin uid (400)",
+      "method": "POST",
+      "path": "/api/otp/trigger",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "uid should not be empty; uid must be a string",
+        "path": "/api/otp/trigger",
+        "timestamp": "2026-04-09T01:12:35.181Z"
+      }
+    },
+    {
+      "testName": "OTP-05 | Trigger body vacío (400)",
+      "method": "POST",
+      "path": "/api/otp/trigger",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "uid should not be empty; uid must be a string; nivelRiesgo should not be empty; nivelRiesgo must be a string; motivo should not be empty; motivo must be a string",
+        "path": "/api/otp/trigger",
+        "timestamp": "2026-04-09T01:12:35.300Z"
+      }
+    },
+    {
+      "testName": "OTP-06 | Verificar código CORRECTO → valido:true (200)",
+      "method": "POST",
+      "path": "/api/otp/verificar",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "valido": true,
+        "mensaje": "Verificación exitosa"
+      }
+    },
+    {
+      "testName": "OTP-07 | Verificar código INCORRECTO → valido:false (200)",
+      "method": "POST",
+      "path": "/api/otp/verificar",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "valido": false,
+        "mensaje": "Código incorrecto. Intentos restantes: 2"
+      }
+    },
+    {
+      "testName": "OTP-08 | Verificar sin otpId (400)",
+      "method": "POST",
+      "path": "/api/otp/verificar",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "otpId should not be empty; otpId must be a string",
+        "path": "/api/otp/verificar",
+        "timestamp": "2026-04-09T01:12:35.899Z"
+      }
+    },
+    {
+      "testName": "OTP-09 | Verificar body vacío (400)",
+      "method": "POST",
+      "path": "/api/otp/verificar",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "uid should not be empty; uid must be a string; otpId should not be empty; otpId must be a string; codigo should not be empty; codigo must be a string",
+        "path": "/api/otp/verificar",
+        "timestamp": "2026-04-09T01:12:36.028Z"
+      }
+    },
+    {
+      "testName": "NOTIF-01 | Actualizar config (200)",
+      "method": "PUT",
+      "path": "/api/notificaciones/config/test-notif-001",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "actualizado": true
+      }
+    },
+    {
+      "testName": "NOTIF-02 | Desactivar notificaciones (200)",
+      "method": "PUT",
+      "path": "/api/notificaciones/config/test-notif-001",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "actualizado": true
+      }
+    },
+    {
+      "testName": "NOTIF-03 | Enviar con permisos OFF → enviado:false (200)",
+      "method": "POST",
+      "path": "/api/notificaciones/enviar",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "enviado": false,
+        "canalesUsados": []
+      }
+    },
+    {
+      "testName": "NOTIF-04 | Reactivar (200)",
+      "method": "PUT",
+      "path": "/api/notificaciones/config/test-notif-001",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "actualizado": true
+      }
+    },
+    {
+      "testName": "NOTIF-05 | Enviar INMEDIATA forzada → enviado:true (200)",
+      "method": "POST",
+      "path": "/api/notificaciones/enviar",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "enviado": true,
+        "canalesUsados": [
+          "PUSH",
+          "WHATSAPP",
+          "SMS",
+          "EMAIL"
+        ]
+      }
+    },
+    {
+      "testName": "NOTIF-06 | Enviar sin campos requeridos (400)",
+      "method": "POST",
+      "path": "/api/notificaciones/enviar",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "alertaId should not be empty; alertaId must be a string; nivelUrgencia should not be empty; nivelUrgencia must be a string; monto must be a number conforming to the specified constraints; comercio should not be empty; comercio must be a string; colorIndicador should not be empty; colorIndicador must be a string",
+        "path": "/api/notificaciones/enviar",
+        "timestamp": "2026-04-09T01:12:36.990Z"
+      }
+    },
+    {
+      "testName": "NOTIF-07 | Enviar body vacío (400)",
+      "method": "POST",
+      "path": "/api/notificaciones/enviar",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string; alertaId should not be empty; alertaId must be a string; nivelUrgencia should not be empty; nivelUrgencia must be a string; monto must be a number conforming to the specified constraints; comercio should not be empty; comercio must be a string; colorIndicador should not be empty; colorIndicador must be a string",
+        "path": "/api/notificaciones/enviar",
+        "timestamp": "2026-04-09T01:12:37.137Z"
+      }
+    },
+    {
+      "testName": "RASP-01 | Amenaza CRÍTICA → sesiones bloqueadas (200)",
+      "method": "POST",
+      "path": "/api/rasp/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "procesado": true,
+        "accionTomada": "Sesiones revocadas. Bloqueo hasta: 2026-04-09T03:12:37.341Z"
+      }
+    },
+    {
+      "testName": "RASP-02 | Amenaza ALTA (200)",
+      "method": "POST",
+      "path": "/api/rasp/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "procesado": true,
+        "accionTomada": "Score degradado en -20 puntos"
+      }
+    },
+    {
+      "testName": "RASP-03 | Amenaza MEDIA (200)",
+      "method": "POST",
+      "path": "/api/rasp/webhook",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "ok": true,
+      "responseBody": {
+        "procesado": true,
+        "accionTomada": "Score degradado en -10 puntos"
+      }
+    },
+    {
+      "testName": "RASP-04 | Sin userId (400)",
+      "method": "POST",
+      "path": "/api/rasp/webhook",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string",
+        "path": "/api/rasp/webhook",
+        "timestamp": "2026-04-09T01:12:37.883Z"
+      }
+    },
+    {
+      "testName": "RASP-05 | Body vacío (400)",
+      "method": "POST",
+      "path": "/api/rasp/webhook",
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "ok": true,
+      "responseBody": {
+        "statusCode": 400,
+        "error": "BAD_REQUEST",
+        "message": "userId should not be empty; userId must be a string; tipoAmenaza should not be empty; tipoAmenaza must be a string; severidad should not be empty; severidad must be a string",
+        "path": "/api/rasp/webhook",
+        "timestamp": "2026-04-09T01:12:38.032Z"
+      }
+    }
+  ]
+}
