@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { GlobalHttpExceptionFilter } from './shared/filters/http-exception.filter';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -14,6 +15,9 @@ async function bootstrap() {
       transform: true,       // Transforma payloads al tipo del DTO automáticamente
     }),
   );
+
+  // Filtro global de excepciones — respuestas de error consistentes
+  app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
   // Prefijo global para todas las rutas
   app.setGlobalPrefix('api');

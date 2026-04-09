@@ -5,7 +5,7 @@ async function enableApi() {
     console.log('Obteniendo token de gcloud...');
     const token = execSync('gcloud auth print-access-token').toString().trim();
     
-    const url = 'https://firestore.googleapis.com/v1/projects/portico-487201/databases/porticodb?updateMask=firestoreDataAccessMode';
+    const url = 'https://firestore.googleapis.com/v1/projects/portico-487201/databases/portico-native?updateMask=firestoreDataAccessMode';
     const body = JSON.stringify({ firestoreDataAccessMode: 'DATA_ACCESS_MODE_ENABLED' });
     
     console.log('Enviando petición PATCH a la API de Firestore Management...');
