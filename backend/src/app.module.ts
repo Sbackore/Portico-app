@@ -8,17 +8,15 @@ import { BankingModule } from './banking/banking.module';
 import { OtpModule } from './otp/otp.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { RaspModule } from './rasp/rasp.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    // Configuración de variables de entorno — disponible en todo el app
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
-    // Módulo Firestore compartido (Global) — inyectable en todos los módulos
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     FirestoreModule,
-    // Servicios Antigravity
+    AuthModule,
+    UsersModule,
     KycModule,
     BankingModule,
     OtpModule,

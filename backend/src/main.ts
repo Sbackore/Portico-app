@@ -7,23 +7,32 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Validación automática de todos los DTOs con class-validator
+  // CORS — acepta requests del frontend Vercel y localhost
+  app.enableCors({
+    origin: [
+      'http://localhost:3001',
+      'http://localhost:3000',
+      /^https:\/\/.*\.vercel\.app$/,
+      process.env.FRONTEND_URL || '',
+    ].filter(Boolean),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,       // Elimina propiedades no declaradas en el DTO
-      forbidNonWhitelisted: true, // Rechaza requests con propiedades extra
-      transform: true,       // Transforma payloads al tipo del DTO automáticamente
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
-  // Filtro global de excepciones — respuestas de error consistentes
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
-
-  // Prefijo global para todas las rutas
   app.setGlobalPrefix('api');
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  logger.log(`🚀 Pórtico Backend corriendo en: http://localhost:${port}/api`);
+  logger.log(`🚀 Pórtico Backend en: http://localhost:${port}/api`);
 }
 bootstrap();
