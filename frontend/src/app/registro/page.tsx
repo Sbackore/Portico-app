@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth, getErrorMessage } from '@/lib/auth';
 import { Button, Input } from '@/components/ui';
-import { User, Mail, Lock, Phone } from 'lucide-react';
+import { User, Mail, Lock, Phone, ArrowLeft, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -41,40 +41,91 @@ export default function RegistroPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-10 animate-fade-in">
-      <div className="flex flex-col items-center gap-2 mt-8 mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7B5EA7] to-[#A78BFA] flex items-center justify-center shadow-lg shadow-purple-900/40">
-          <span className="text-white font-bold text-xl">P</span>
+    <div className="min-h-screen flex flex-col animate-fade-in text-surface-container-lowest bg-[#0A0A0F]">
+      {/* TopAppBar */}
+      <header className="fixed top-0 w-full z-50 bg-[#0A0A0F]/80 backdrop-blur-2xl shadow-[0px_12px_32px_rgba(108,71,255,0.05)] flex items-center justify-between px-6 h-16">
+        <Link href="/login" className="text-primary-container hover:opacity-80 transition-opacity active:scale-95 duration-200">
+          <ArrowLeft size={24} />
+        </Link>
+        <h1 className="text-xl font-bold text-surface-container-lowest font-headline tracking-[-0.02em]">Pórtico</h1>
+        <button className="text-primary-container hover:opacity-80 transition-opacity active:scale-95 duration-200">
+          <HelpCircle size={24} />
+        </button>
+      </header>
+
+      {/* Main Content Canvas */}
+      <main className="flex-grow pt-24 pb-12 px-6 max-w-md mx-auto w-full flex flex-col">
+        {/* Header Section */}
+        <div className="mb-10 pl-2">
+          <h2 className="text-3xl font-bold tracking-[-0.02em] font-headline mb-2 text-surface-container-lowest">
+            Completa tus datos
+          </h2>
+          <p className="text-surface-dim text-sm leading-relaxed">
+            Únete a Pórtico y transforma tu experiencia financiera.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold text-white">Crea tu cuenta</h1>
-        <p className="text-gray-400 text-sm">Empieza a gestionar tu dinero</p>
-      </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input label="Nombre completo" placeholder="Juan Pérez" value={form.nombre}
-          onChange={set('nombre')} icon={<User size={16} />} error={errors.nombre} />
-        <Input label="Correo electrónico" type="email" placeholder="tu@correo.com" value={form.email}
-          onChange={set('email')} icon={<Mail size={16} />} error={errors.email} />
-        <Input label="Contraseña" type="password" placeholder="Mínimo 8 caracteres" value={form.password}
-          onChange={set('password')} icon={<Lock size={16} />} error={errors.password} />
-        <Input label="Teléfono (opcional)" type="tel" placeholder="+57 300 000 0000" value={form.telefono}
-          onChange={set('telefono')} icon={<Phone size={16} />} />
+        {/* Form Section */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <Input 
+            label="Nombre completo" 
+            placeholder="Ej. Ana María García" 
+            value={form.nombre}
+            onChange={set('nombre')} 
+            icon={<User size={18} />} 
+            error={errors.nombre} 
+          />
+          
+          <Input 
+            label="Correo electrónico" 
+            type="email" 
+            placeholder="correo@ejemplo.com" 
+            value={form.email}
+            onChange={set('email')} 
+            icon={<Mail size={18} />} 
+            error={errors.email} 
+          />
+          
+          <Input 
+            label="Contraseña" 
+            type="password" 
+            placeholder="Mínimo 8 caracteres" 
+            value={form.password}
+            onChange={set('password')} 
+            icon={<Lock size={18} />} 
+            error={errors.password} 
+          />
+          
+          <Input 
+            label="Número de celular (opcional)" 
+            type="tel" 
+            placeholder="300 000 0000" 
+            value={form.telefono}
+            onChange={set('telefono')} 
+            icon={<Phone size={18} />} 
+          />
 
-        <p className="text-xs text-gray-500 text-center px-4">
-          Al registrarte aceptas nuestros{' '}
-          <span className="text-[#A78BFA]">Términos de servicio</span> y{' '}
-          <span className="text-[#A78BFA]">Política de privacidad</span>
-        </p>
+          <p className="text-xs text-surface-dim text-center px-4 mt-2">
+            Al registrarte aceptas nuestros{' '}
+            <span className="text-primary-container font-semibold cursor-pointer">Términos de servicio</span> y{' '}
+            <span className="text-primary-container font-semibold cursor-pointer">Política de privacidad</span>
+          </p>
 
-        <Button type="submit" loading={loading} fullWidth size="lg">
-          Crear cuenta
-        </Button>
-      </form>
+          {/* Tonal Separation & Submit */}
+          <div className="pt-6 pb-4">
+            <Button type="submit" loading={loading} fullWidth size="md">
+              Crear cuenta
+            </Button>
+          </div>
+        </form>
 
-      <div className="text-center text-sm text-gray-400 mt-6">
-        ¿Ya tienes cuenta?{' '}
-        <Link href="/login" className="text-[#A78BFA] font-semibold">Inicia sesión</Link>
-      </div>
+        <div className="text-center text-sm text-surface-dim mt-2">
+          ¿Ya tienes cuenta?{' '}
+          <Link href="/login" className="text-surface-container-lowest font-semibold hover:text-primary-container transition-colors ml-1">
+            Inicia sesión
+          </Link>
+        </div>
+      </main>
     </div>
   );
 }

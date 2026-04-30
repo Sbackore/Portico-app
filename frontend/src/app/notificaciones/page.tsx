@@ -3,10 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
-import { Card, Badge, PageLoader } from '@/components/ui';
-import { Bell, BellOff, Settings } from 'lucide-react';
+import { PageLoader } from '@/components/ui';
+import { Menu, UserCircle, BellOff } from 'lucide-react';
 import api from '@/lib/api';
-import Link from 'next/link';
 
 interface Notificacion {
   id: string; alertaId: string; comercio?: string; monto?: number;
@@ -15,9 +14,9 @@ interface Notificacion {
 }
 
 const urgencyConfig = {
-  INMEDIATA: { color: 'red' as const, dot: 'bg-red-500', label: 'Urgente' },
-  ALTA: { color: 'orange' as const, dot: 'bg-orange-500', label: 'Alta' },
-  INFORMATIVA: { color: 'gray' as const, dot: 'bg-gray-500', label: 'Info' },
+  INMEDIATA: { color: 'error', glow: 'bg-error/10', border: 'border-error/30', badge: 'bg-error/20 text-error border-error/30' },
+  ALTA: { color: 'orange', glow: 'bg-orange-500/10', border: 'border-orange-500/30', badge: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+  INFORMATIVA: { color: 'primary', glow: 'bg-primary/10', border: 'border-primary/30', badge: 'bg-primary/20 text-primary-fixed border-primary/30' },
 };
 
 export default function NotificacionesPage() {
@@ -45,54 +44,68 @@ export default function NotificacionesPage() {
   const noLeidas = notis.filter(n => !n.leida).length;
 
   return (
-    <div className="min-h-screen pb-24 animate-fade-in">
-      <div className="bg-[#0F1022] px-5 pt-12 pb-4 sticky top-0 z-30 border-b border-[#1E2040]">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-xl font-bold text-white">Alertas</h1>
-          <Link href="/notificaciones/config">
-            <Settings size={20} className="text-gray-400" />
-          </Link>
-        </div>
-        {noLeidas > 0 && (
-          <p className="text-xs text-[#A78BFA]">{noLeidas} nuevas notificaciones</p>
-        )}
-      </div>
+    <div className="font-body antialiased min-h-screen flex flex-col relative pb-[90px] bg-[#0A0A0F] text-white animate-fade-in">
+      {/* TopAppBar */}
+      <header className="bg-[#0A0A0F]/80 backdrop-blur-xl fixed top-0 z-50 shadow-sm shadow-[0px_12px_32px_rgba(108,71,255,0.08)] flex justify-between items-center w-full px-6 py-4 border-b border-white/5">
+        <button className="scale-95 active:scale-90 transition-transform hover:opacity-80">
+          <Menu className="text-white w-7 h-7" />
+        </button>
+        <h1 className="font-headline font-bold text-xl tracking-tight text-white">Notificaciones</h1>
+        <button className="scale-95 active:scale-90 transition-transform hover:opacity-80 w-9 h-9 rounded-full overflow-hidden border-2 border-primary-container/30 flex items-center justify-center bg-slate-800">
+          <UserCircle size={24} className="text-surface-dim" />
+        </button>
+      </header>
 
-      <div className="px-5 py-4 space-y-3">
+      {/* Main Content Canvas */}
+      <main className="flex-grow flex flex-col px-6 pt-24 pb-12 max-w-2xl mx-auto w-full">
+        {noLeidas > 0 && (
+          <p className="text-xs font-label text-primary-fixed-dim mb-4 px-2">{noLeidas} nuevas notificaciones</p>
+        )}
+
         {notis.length === 0 ? (
-          <div className="text-center py-16">
-            <BellOff size={48} className="text-gray-600 mx-auto mb-4" />
-            <p className="text-white font-semibold">Todo tranquilo por aquí</p>
-            <p className="text-gray-400 text-sm mt-1">No tienes notificaciones pendientes.</p>
+          /* Empty State Container */
+          <div className="flex-grow flex flex-col items-center justify-center pt-20 pb-32">
+            <div className="w-24 h-24 rounded-full bg-primary-container/10 flex items-center justify-center mb-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)]">
+              <BellOff className="text-primary-container opacity-80 w-12 h-12" strokeWidth={1.5} />
+            </div>
+            <h2 className="font-headline font-bold text-2xl tracking-tight text-white mb-3">Sin alertas</h2>
+            <p className="font-body text-[15px] text-white/60 text-center max-w-[280px] leading-relaxed">
+              No tienes notificaciones pendientes ni alertas recientes en este momento.
+            </p>
           </div>
         ) : (
-          notis.map(n => {
-            const cfg = urgencyConfig[n.nivelUrgencia];
-            return (
-              <Card key={n.id} className={`${!n.leida ? 'border-[#2D3060]' : 'opacity-70'}`}>
-                <div className="flex items-start gap-3">
-                  <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${cfg.dot}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge color={cfg.color}>{cfg.label}</Badge>
-                      {!n.leida && <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA]" />}
-                    </div>
-                    <p className="text-sm text-white font-medium">{n.mensaje}</p>
-                    {n.comercio && n.monto && (
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {n.comercio} · ${n.monto.toLocaleString('es-CO')}
+          <div className="flex flex-col gap-4">
+            {notis.map(n => {
+              const cfg = urgencyConfig[n.nivelUrgencia];
+              return (
+                <article key={n.id} className={`bg-[#0F1022] rounded-[20px] p-5 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-all duration-200 ${!n.leida ? 'border border-white/10' : 'opacity-70'}`}>
+                  <div className={`absolute top-0 right-0 w-24 h-24 ${cfg.glow} blur-2xl rounded-full -mr-8 -mt-8 pointer-events-none`}></div>
+                  
+                  <div className="flex items-start gap-4 relative z-10">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className={`px-2 py-1 rounded-full flex items-center gap-1.5 border ${cfg.badge}`}>
+                          <span className="text-[10px] font-label font-bold tracking-wide uppercase">{n.nivelUrgencia}</span>
+                        </div>
+                        {!n.leida && <span className="w-2 h-2 rounded-full bg-primary-fixed-dim shadow-[0_0_8px_rgba(201,190,255,0.8)]" />}
+                      </div>
+                      <p className="text-[15px] text-white font-medium leading-snug">{n.mensaje}</p>
+                      {n.comercio && n.monto && (
+                        <p className="text-sm text-surface-dim font-semibold mt-1">
+                          {n.comercio} <span className="text-surface-dim/70 font-normal">·</span> ${n.monto.toLocaleString('es-CO')}
+                        </p>
+                      )}
+                      <p className="text-xs text-surface-dim/60 mt-2 font-medium">
+                        {new Date(n.fechaHora).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </p>
-                    )}
-                    <p className="text-xs text-gray-600 mt-1">
-                      {new Date(n.fechaHora).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            );
-          })
+                </article>
+              );
+            })}
+          </div>
         )}
-      </div>
+      </main>
 
       <BottomNav alertaBadge={noLeidas} />
     </div>

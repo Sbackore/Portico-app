@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth, getErrorMessage } from '@/lib/auth';
 import { Button, Input } from '@/components/ui';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -37,70 +37,101 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between px-6 py-10 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col items-center gap-2 mt-12">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#7B5EA7] to-[#A78BFA] flex items-center justify-center mb-2 shadow-lg shadow-purple-900/40">
-          <span className="text-white font-bold text-2xl">P</span>
-        </div>
-        <h1 className="text-2xl font-bold text-white">Bienvenido de vuelta</h1>
-        <p className="text-gray-400 text-sm text-center">Ingresa a tu cuenta Pórtico</p>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden text-surface-container-lowest animate-fade-in">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-container/20 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
-        <Input
-          label="Correo electrónico"
-          type="email"
-          placeholder="tu@correo.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          icon={<Mail size={16} />}
-          error={errors.email}
-          autoComplete="email"
-        />
-        <div className="flex flex-col gap-1.5">
-          <Input
-            label="Contraseña"
-            type={showPass ? 'text' : 'password'}
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            icon={<Lock size={16} />}
-            error={errors.password}
-            autoComplete="current-password"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPass(v => !v)}
-            className="self-end text-xs text-[#A78BFA] flex items-center gap-1"
-          >
-            {showPass ? <EyeOff size={12} /> : <Eye size={12} />}
-            {showPass ? 'Ocultar' : 'Ver'}
-          </button>
-        </div>
+      {/* Main Content Container */}
+      <main className="relative z-10 w-full max-w-md px-6 py-12 flex flex-col min-h-screen justify-center">
+        {/* Top App Bar / Brand Header */}
+        <header className="flex flex-col items-center justify-center mb-12">
+          <div className="flex items-center gap-3 mb-2">
+            <Shield className="text-primary-container w-10 h-10" fill="currentColor" />
+            <span className="font-headline font-bold text-3xl tracking-tighter text-primary-container">Pórtico</span>
+          </div>
+        </header>
 
-        <Link href="/recuperar" className="text-xs text-[#A78BFA] self-end -mt-2">
-          ¿Olvidaste tu contraseña?
-        </Link>
+        {/* Welcome Section */}
+        <section className="mb-10 text-center space-y-3">
+          <h1 className="font-display text-[2rem] font-bold leading-tight tracking-[-0.02em] text-surface-container-lowest">
+            Bienvenido
+          </h1>
+          <p className="font-body text-surface-dim text-base leading-relaxed max-w-[280px] mx-auto">
+            Ingresa tus credenciales para acceder a tu cuenta protegida.
+          </p>
+        </section>
 
-        <Button type="submit" loading={loading} fullWidth size="lg" className="mt-2">
-          Iniciar sesión
-        </Button>
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-6 flex-grow flex flex-col">
+          <div className="space-y-4">
+            {/* User/Email Input */}
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="Usuario o Correo"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                icon={<Mail size={20} />}
+                error={errors.email}
+                autoComplete="email"
+              />
+            </div>
 
-        {/* Demo hint */}
-        <div className="bg-[#13152B] border border-[#1E2040] rounded-xl p-3 text-xs text-gray-400 text-center">
-          Modo demo activo · Crea una cuenta para comenzar
-        </div>
-      </form>
+            {/* Password Input */}
+            <div className="relative">
+              <Input
+                type={showPass ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                icon={<Lock size={20} />}
+                error={errors.password}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(v => !v)}
+                className="absolute right-4 top-[26px] -translate-y-1/2 text-outline hover:text-surface-container-lowest transition-colors"
+                tabIndex={-1}
+              >
+                {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
 
-      {/* Footer */}
-      <div className="text-center text-sm text-gray-400 mt-8">
-        ¿No tienes cuenta?{' '}
-        <Link href="/registro" className="text-[#A78BFA] font-semibold">
-          Regístrate
-        </Link>
-      </div>
+          {/* Forgot Password Link */}
+          <div className="flex justify-end">
+            <Link href="/recuperar" className="font-label font-semibold text-sm text-primary-container hover:text-primary-fixed-dim transition-colors">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+
+          {/* Primary Action Button */}
+          <div className="pt-4">
+            <Button type="submit" loading={loading} fullWidth size="md">
+              Iniciar sesión
+            </Button>
+          </div>
+          
+          {/* Demo hint */}
+          <div className="bg-[#1A1A24] border border-outline/20 rounded-xl p-3 text-xs text-surface-dim text-center mt-2">
+            Modo demo activo · Usa correo falso y clave libre
+          </div>
+        </form>
+
+        {/* Footer */}
+        <footer className="mt-auto pt-8 text-center">
+          <p className="font-label text-sm text-surface-dim">
+            ¿No tienes una cuenta?{' '}
+            <Link href="/registro" className="text-surface-container-lowest font-semibold hover:text-primary-container transition-colors ml-1">
+              Regístrate
+            </Link>
+          </p>
+        </footer>
+      </main>
     </div>
   );
 }

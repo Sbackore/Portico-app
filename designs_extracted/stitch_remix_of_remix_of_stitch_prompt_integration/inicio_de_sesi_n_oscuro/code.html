@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pórtico - Iniciar Sesión</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#1a0063",
+                        "secondary-fixed-dim": "#c9bfff",
+                        "on-tertiary-container": "#ffeae1",
+                        "surface-container-high": "#e7e8ed",
+                        "outline-variant": "#c9c3d9",
+                        "outline": "#797588",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1f",
+                        "on-primary-fixed": "#1b0063",
+                        "secondary-fixed": "#e5deff",
+                        "primary-fixed-dim": "#c9beff",
+                        "tertiary": "#8d3b00",
+                        "surface-container": "#edeef3",
+                        "on-background": "#191c1f",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#783100",
+                        "on-secondary-container": "#fffbff",
+                        "background": "#f8f9fe",
+                        "tertiary-fixed": "#ffdbcb",
+                        "surface": "#f8f9fe",
+                        "primary-container": "#6c47ff",
+                        "on-primary-fixed-variant": "#4500d8",
+                        "tertiary-container": "#b34d00",
+                        "secondary-container": "#755fe5",
+                        "primary": "#5323e6",
+                        "on-surface-variant": "#484556",
+                        "inverse-on-surface": "#eff0f5",
+                        "secondary": "#5c44ca",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#5e35f1",
+                        "surface-container-highest": "#e1e2e7",
+                        "surface-dim": "#d8dadf",
+                        "inverse-primary": "#c9beff",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f8f9fe",
+                        "surface-container-low": "#f2f3f8",
+                        "surface-variant": "#e1e2e7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#341100",
+                        "on-secondary-fixed-variant": "#462ab4",
+                        "inverse-surface": "#2e3134",
+                        "primary-fixed": "#e6deff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#f1ebff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0F; /* Deep dark background */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden text-surface-container-lowest">
+<!-- Decorative Background Elements -->
+<div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-container/20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full"></div>
+</div>
+<!-- Main Content Container -->
+<main class="relative z-10 w-full max-w-md px-6 py-12 flex flex-col">
+<!-- Top App Bar / Brand Header -->
+<header class="flex flex-col items-center justify-center mb-12">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary-container text-4xl" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="font-headline font-bold text-2xl tracking-tighter text-primary-container">Pórtico</span>
+</div>
+</header>
+<!-- Welcome Section -->
+<section class="mb-10 text-center space-y-3">
+<h1 class="font-display text-[2rem] font-bold leading-tight tracking-[-0.02em] text-surface-container-lowest">Bienvenido</h1>
+<p class="font-body text-surface-dim text-base leading-relaxed max-w-[280px] mx-auto">
+                Ingresa tus credenciales para acceder a tu cuenta protegida.
+            </p>
+</section>
+<!-- Login Form -->
+<form class="space-y-6 flex-grow flex flex-col">
+<div class="space-y-4">
+<!-- User/Email Input -->
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">person</span>
+<input class="w-full bg-[#1A1A24] border-none text-surface-container-lowest placeholder:text-outline rounded-[14px] py-4 pl-12 pr-4 focus:ring-1 focus:ring-primary-container focus:bg-[#222230] transition-colors font-body text-base outline-none" placeholder="Usuario o Correo" type="text"/>
+</div>
+<!-- Password Input -->
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">lock</span>
+<input class="w-full bg-[#1A1A24] border-none text-surface-container-lowest placeholder:text-outline rounded-[14px] py-4 pl-12 pr-12 focus:ring-1 focus:ring-primary-container focus:bg-[#222230] transition-colors font-body text-base outline-none" placeholder="Contraseña" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-surface-container-lowest transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Forgot Password Link -->
+<div class="flex justify-end">
+<a class="font-label font-semibold text-sm text-primary-container hover:text-primary-fixed-dim transition-colors" href="#">
+                    ¿Olvidaste tu contraseña?
+                </a>
+</div>
+<!-- Primary Action Button -->
+<div class="pt-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-label font-semibold text-base py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(108,71,255,0.15)] active:scale-95 transition-all duration-200" type="submit">
+                    Iniciar sesión
+                </button>
+</div>
+<!-- Divider -->
+<!-- Biometric Button -->
+</form>
+<!-- Footer -->
+<footer class="mt-auto pt-8 text-center">
+<p class="font-label text-sm text-surface-dim">
+                ¿No tienes una cuenta? 
+                <a class="text-surface-container-lowest font-semibold hover:text-primary-container transition-colors ml-1" href="#">Regístrate</a>
+</p>
+</footer>
+</main>
+</body></html>

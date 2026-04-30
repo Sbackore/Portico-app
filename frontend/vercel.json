@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "portico-app",
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://portico-backend-910308527640.us-central1.run.app/api"
+  }
+}

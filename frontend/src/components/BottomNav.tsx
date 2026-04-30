@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, CreditCard, Bell, Shield, User } from 'lucide-react';
-import { clsx } from 'clsx';
+import { cn } from './ui';
 
 const tabs = [
   { href: '/home', label: 'Inicio', icon: Home },
@@ -14,34 +14,37 @@ const tabs = [
 
 export function BottomNav({ alertaBadge = 0 }: { alertaBadge?: number }) {
   const pathname = usePathname();
+  
+  // Ocultar BottomNav en pantallas de Auth
+  if (['/login', '/registro', '/recuperar'].includes(pathname)) return null;
+
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-[#0F1022] border-t border-[#1E2040] z-40">
-      <div className="flex items-center justify-around px-2 py-2 pb-safe">
-        {tabs.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={clsx(
-                'flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all relative',
-                active ? 'text-[#A78BFA]' : 'text-gray-500 hover:text-gray-300'
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-3 bg-[#0A0A0F]/90 backdrop-blur-2xl rounded-t-[20px] shadow-[0px_-8px_24px_rgba(108,71,255,0.06)] md:hidden">
+      {tabs.map(({ href, label, icon: Icon }) => {
+        const active = pathname.startsWith(href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'flex flex-col items-center justify-center px-3 py-2 scale-98 active:scale-95 transition-all relative',
+              active 
+                ? 'text-primary-fixed-dim bg-primary/10 rounded-2xl' 
+                : 'text-surface-dim hover:text-white'
+            )}
+          >
+            <span className="relative mb-1">
+              <Icon size={24} strokeWidth={active ? 2.5 : 2} fill={active ? 'currentColor' : 'none'} className={active ? 'text-primary-fixed-dim' : ''} />
+              {href === '/notificaciones' && alertaBadge > 0 && (
+                <span className="absolute -top-1 -right-1 bg-error text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-[#0A0A0F]">
+                  {alertaBadge > 9 ? '9+' : alertaBadge}
+                </span>
               )}
-            >
-              <span className="relative">
-                <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
-                {href === '/notificaciones' && alertaBadge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                    {alertaBadge > 9 ? '9+' : alertaBadge}
-                  </span>
-                )}
-              </span>
-              <span className="text-[10px] font-medium">{label}</span>
-              {active && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#7B5EA7]" />}
-            </Link>
-          );
-        })}
-      </div>
+            </span>
+            <span className="font-label text-[10px] font-medium tracking-wide">{label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }

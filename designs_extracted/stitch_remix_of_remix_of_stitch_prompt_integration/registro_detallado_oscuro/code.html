@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pórtico - Registro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "on-background": "#191c1f",
+                        "surface-tint": "#5e35f1",
+                        "primary": "#5323e6",
+                        "secondary-fixed": "#e5deff",
+                        "on-primary-container": "#f1ebff",
+                        "on-primary": "#ffffff",
+                        "surface": "#f8f9fe",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#8d3b00",
+                        "inverse-on-surface": "#eff0f5",
+                        "tertiary-fixed": "#ffdbcb",
+                        "primary-fixed": "#e6deff",
+                        "on-tertiary-fixed-variant": "#783100",
+                        "on-secondary-fixed-variant": "#462ab4",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#484556",
+                        "on-surface": "#191c1f",
+                        "on-primary-fixed-variant": "#4500d8",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e1e2e7",
+                        "outline": "#797588",
+                        "surface-container-highest": "#e1e2e7",
+                        "secondary-container": "#755fe5",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c9c3d9",
+                        "on-secondary-container": "#fffbff",
+                        "on-primary-fixed": "#1b0063",
+                        "tertiary-container": "#b34d00",
+                        "surface-bright": "#f8f9fe",
+                        "secondary": "#5c44ca",
+                        "on-secondary-fixed": "#1a0063",
+                        "primary-fixed-dim": "#c9beff",
+                        "inverse-primary": "#c9beff",
+                        "on-tertiary-fixed": "#341100",
+                        "primary-container": "#6c47ff",
+                        "secondary-fixed-dim": "#c9bfff",
+                        "surface-dim": "#d8dadf",
+                        "surface-container-low": "#f2f3f8",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e7e8ed",
+                        "surface-container": "#edeef3",
+                        "on-tertiary-container": "#ffeae1",
+                        "background": "#f8f9fe",
+                        "inverse-surface": "#2e3134"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1.25rem", // Updated to 20px per rules
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px",
+                        "input": "14px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+<style>
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-slate-950 text-white font-body antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl shadow-[0px_12px_32px_rgba(108,71,255,0.05)] flex items-center justify-between px-6 h-16 w-full">
+<button class="text-[#5323E6] dark:text-[#6C47FF] hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tighter font-['Inter'] font-semibold tracking-[-0.02em]">Pórtico</h1>
+<button class="text-[#5323E6] dark:text-[#6C47FF] hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="help" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-12 px-6 max-w-md mx-auto w-full flex flex-col">
+<!-- Header Section -->
+<div class="mb-10 pl-2">
+<h2 class="text-3xl font-bold tracking-[-0.02em] font-headline mb-2 text-white">Completa tus datos</h2>
+<p class="text-slate-400 text-sm leading-relaxed">Únete a Pórtico y transforma tu experiencia financiera.</p>
+</div>
+<!-- Form Section -->
+<form class="flex flex-col gap-6" onsubmit="event.preventDefault();">
+<!-- Row: Nombres & Apellidos -->
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Nombres</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full placeholder-slate-600" placeholder="Ej. Ana María" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Apellidos</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full placeholder-slate-600" placeholder="Ej. García" type="text"/>
+</div>
+</div>
+<!-- Número de celular -->
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Número de celular</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full placeholder-slate-600" placeholder="300 000 0000" type="tel"/>
+</div>
+<!-- Row: Fecha de nacimiento & Edad -->
+<div class="grid grid-cols-[2fr_1fr] gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Fecha de nacimiento</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full [color-scheme:dark]" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Edad</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full text-center placeholder-slate-600" placeholder="00" type="number"/>
+</div>
+</div>
+<!-- Número de documento -->
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Número de documento</label>
+<div class="relative">
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full placeholder-slate-600" placeholder="C.C. o C.E." type="text"/>
+</div>
+</div>
+<!-- Fecha de expedición del documento -->
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Fecha de expedición del documento</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full [color-scheme:dark]" type="date"/>
+</div>
+<!-- Correo electrónico -->
+<div class="flex flex-col gap-2">
+<label class="text-[12px] font-semibold text-slate-400 font-label ml-1">Correo electrónico</label>
+<input class="h-14 px-4 rounded-input bg-slate-800/50 text-white border-0 focus:ring-1 focus:ring-primary-container focus:bg-slate-800 transition-all text-sm w-full placeholder-slate-600" placeholder="correo@ejemplo.com" type="email"/>
+</div>
+<!-- Tonal Separation & Submit -->
+<div class="pt-8 pb-4">
+<button class="w-full h-14 rounded-full bg-gradient-to-br from-primary to-primary-container text-white font-semibold text-base tracking-wide flex justify-center items-center gap-2 active:scale-[0.98] transition-transform duration-200 shadow-[0px_12px_32px_rgba(108,71,255,0.15)]" type="submit">
+                    Continuar
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</form>
+</main>
+<!-- BottomNavBar Suppressed: Linear/Transactional Intent -->
+</body></html>

@@ -1,6 +1,11 @@
 'use client';
 import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import { Loader2 } from 'lucide-react';
+
+export function cn(...inputs: (string | undefined | null | false)[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
@@ -12,22 +17,25 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({
   variant = 'primary', size = 'md', loading, fullWidth, children, className, disabled, ...props
 }: ButtonProps) {
-  const base = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95';
+  const base = 'inline-flex items-center justify-center gap-2 font-label font-semibold rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95';
+  
   const variants = {
-    primary: 'bg-[#7B5EA7] hover:bg-[#9B7EC7] text-white shadow-lg shadow-purple-900/30',
-    secondary: 'bg-[#1A1C35] hover:bg-[#1E2040] text-white border border-[#2D3060]',
-    danger: 'bg-[#DC2626] hover:bg-[#B91C1C] text-white',
-    ghost: 'bg-transparent hover:bg-white/5 text-white',
-    outline: 'bg-transparent border border-[#7B5EA7] text-[#A78BFA] hover:bg-[#7B5EA7]/10',
+    primary: 'bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-[0px_12px_32px_rgba(108,71,255,0.15)] hover:brightness-110',
+    secondary: 'bg-[#1A1A24] hover:bg-[#222230] text-surface-container-lowest',
+    danger: 'bg-error hover:bg-error/90 text-on-error shadow-[0px_12px_32px_rgba(186,26,26,0.15)]',
+    ghost: 'bg-transparent hover:bg-white/5 text-surface-container-lowest',
+    outline: 'bg-transparent border border-outline text-surface-container-lowest hover:bg-white/5',
   };
-  const sizes = { sm: 'px-3 py-2 text-sm', md: 'px-5 py-3 text-base', lg: 'px-6 py-4 text-lg' };
+  
+  const sizes = { sm: 'px-6 py-3 text-sm', md: 'px-8 py-4 text-base', lg: 'px-10 py-5 text-lg' };
+  
   return (
     <button
-      className={clsx(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
+      className={cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <Loader2 size={16} className="animate-spin" />}
+      {loading && <Loader2 size={18} className="animate-spin" />}
       {children}
     </button>
   );
@@ -42,55 +50,63 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export function Input({ label, error, icon, className, ...props }: InputProps) {
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      {label && <label className="text-sm font-medium text-gray-300">{label}</label>}
+      {label && <label className="text-sm font-label font-medium text-surface-dim ml-1">{label}</label>}
       <div className="relative">
-        {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">{icon}</span>}
+        {icon && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-outline">{icon}</span>}
         <input
-          className={clsx(
-            'w-full rounded-xl bg-[#13152B] border text-white placeholder-gray-500 transition-colors',
-            'focus:outline-none focus:border-[#7B5EA7]',
-            error ? 'border-red-500' : 'border-[#1E2040]',
-            icon ? 'pl-10 pr-4 py-3' : 'px-4 py-3',
-            'text-sm',
+          className={cn(
+            'w-full bg-[#1A1A24] border-none text-surface-container-lowest placeholder:text-outline rounded-[14px] py-4 transition-colors font-body text-base outline-none',
+            'focus:ring-1 focus:ring-primary-container focus:bg-[#222230]',
+            error && 'ring-1 ring-error bg-[#221010]',
+            icon ? 'pl-12 pr-4' : 'px-4',
             className
           )}
           {...props}
         />
       </div>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs font-label text-error ml-1 mt-0.5">{error}</p>}
     </div>
   );
 }
 
-interface CardProps { children: React.ReactNode; className?: string; onClick?: () => void; }
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode; 
+  onClick?: () => void; 
+}
 
-export function Card({ children, className, onClick }: CardProps) {
+export function Card({ children, className, onClick, ...props }: CardProps) {
   return (
     <div
       onClick={onClick}
-      className={clsx(
-        'bg-[#13152B] border border-[#1E2040] rounded-2xl p-4',
-        onClick && 'cursor-pointer hover:border-[#7B5EA7] transition-colors active:scale-[0.98]',
+      className={cn(
+        'card-bg rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden',
+        onClick && 'cursor-pointer transition-transform duration-200 active:scale-[0.98]',
         className
       )}
+      {...props}
     >
       {children}
     </div>
   );
 }
 
-interface BadgeProps { children: React.ReactNode; color?: 'green' | 'orange' | 'red' | 'purple' | 'gray'; }
+interface BadgeProps { 
+  children: React.ReactNode; 
+  color?: 'green' | 'orange' | 'red' | 'purple' | 'gray'; 
+  icon?: React.ReactNode;
+}
 
-export function Badge({ children, color = 'purple' }: BadgeProps) {
+export function Badge({ children, color = 'purple', icon }: BadgeProps) {
   const colors = {
-    green: 'bg-green-500/20 text-green-400 border-green-500/30',
+    green: 'bg-[#00FF85]/20 text-[#00FF85] border-[#00FF85]/30', // Using generic green as requested or mapping
     orange: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     red: 'bg-red-500/20 text-red-400 border-red-500/30',
-    purple: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    gray: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+    purple: 'bg-primary/20 text-primary-fixed border-primary/30',
+    gray: 'bg-slate-800/50 text-slate-300 border-slate-700/50',
   };
   return (
-    <span className={clsx('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border', colors[color])}>
+    <span className={cn('px-3 py-1.5 rounded-full flex items-center gap-1.5 border font-label font-semibold tracking-wide uppercase text-xs w-fit', colors[color])}>
+      {icon && <span className="flex items-center justify-center [&>svg]:w-[14px] [&>svg]:h-[14px]">{icon}</span>}
       {children}
     </span>
   );
@@ -98,19 +114,16 @@ export function Badge({ children, color = 'purple' }: BadgeProps) {
 
 export function Spinner({ size = 24 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="animate-spin text-[#7B5EA7]">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
+    <Loader2 size={size} className="animate-spin text-primary-container" />
   );
 }
 
 export function PageLoader() {
   return (
-    <div className="fixed inset-0 bg-[#0A0B1E] flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[#0A0A0F] flex items-center justify-center z-50">
       <div className="flex flex-col items-center gap-4">
         <Spinner size={40} />
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <p className="text-surface-dim text-sm font-label">Cargando...</p>
       </div>
     </div>
   );

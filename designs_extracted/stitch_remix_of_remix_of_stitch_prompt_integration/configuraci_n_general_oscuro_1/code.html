@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configuración</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#e7e8ed",
+                      "on-secondary-fixed": "#1a0063",
+                      "primary": "#5323e6",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#8d3b00",
+                      "inverse-surface": "#2e3134",
+                      "on-surface": "#191c1f",
+                      "surface": "#f8f9fe",
+                      "surface-container-highest": "#e1e2e7",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e1e2e7",
+                      "on-surface-variant": "#484556",
+                      "inverse-on-surface": "#eff0f5",
+                      "secondary": "#5c44ca",
+                      "tertiary-fixed": "#ffdbcb",
+                      "tertiary-fixed-dim": "#ffb691",
+                      "on-primary-container": "#f1ebff",
+                      "on-secondary": "#ffffff",
+                      "surface-tint": "#5e35f1",
+                      "secondary-fixed": "#e5deff",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed": "#341100",
+                      "surface-container": "#edeef3",
+                      "on-primary-fixed-variant": "#4500d8",
+                      "on-secondary-fixed-variant": "#462ab4",
+                      "surface-dim": "#d8dadf",
+                      "on-secondary-container": "#fffbff",
+                      "on-primary-fixed": "#1b0063",
+                      "secondary-fixed-dim": "#c9bfff",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#f2f3f8",
+                      "surface-bright": "#f8f9fe",
+                      "primary-container": "#6c47ff",
+                      "outline": "#797588",
+                      "on-primary": "#ffffff",
+                      "secondary-container": "#755fe5",
+                      "tertiary-container": "#b34d00",
+                      "primary-fixed-dim": "#c9beff",
+                      "background": "#191C1F", /* Overriding for dark mode deep background */
+                      "on-tertiary-container": "#ffeae1",
+                      "outline-variant": "#c9c3d9",
+                      "on-background": "#ffffff",
+                      "inverse-primary": "#c9beff",
+                      "primary-fixed": "#e6deff",
+                      "on-tertiary-fixed-variant": "#783100",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Inter"],
+                      "display": ["Inter"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #191C1F; color: #ffffff; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#191C1F] text-white min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-[#F2F3F8]/80 dark:bg-[#191C1F]/80 backdrop-blur-xl font-['Inter'] font-semibold tracking-tight text-on-surface dark:text-white docked full-width top-0 sticky shadow-none flex items-center justify-between px-6 py-4 w-full max-w-screen-xl mx-auto z-40">
+<button class="text-[#5323E6] dark:text-[#6C47FF] hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors scale-95 active:scale-90 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-xl font-black tracking-tighter text-[#5323E6] dark:text-[#6C47FF]">Configuración</h1>
+<div class="w-10"></div> <!-- Spacer -->
+</header>
+<!-- Main Content (Editorial Fluidity, Tonal Layering) -->
+<main class="max-w-screen-md mx-auto px-6 pt-8 pb-12 space-y-6">
+<!-- Section Title (Asymmetrical) -->
+<h2 class="text-2xl font-bold tracking-tight text-white mb-8 pl-4 border-l-4 border-[#6C47FF]">Ajustes de la cuenta</h2>
+<!-- Options List -->
+<div class="flex flex-col space-y-6">
+<!-- Option 1: Configuración de perfil -->
+<button class="flex items-center justify-between p-5 bg-[#2e3134] rounded-[20px] shadow-[0px_12px_32px_rgba(108,71,255,0.08)] hover:bg-[#383b3e] transition-colors group text-left">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#191C1F] flex items-center justify-center text-[#6C47FF] group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<h3 class="text-lg font-semibold text-white">Configuración de perfil</h3>
+<p class="text-sm text-slate-400 mt-1">Información personal y preferencias</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Option 2: Ayuda -->
+<button class="flex items-center justify-between p-5 bg-[#2e3134] rounded-[20px] shadow-[0px_12px_32px_rgba(108,71,255,0.08)] hover:bg-[#383b3e] transition-colors group text-left">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#191C1F] flex items-center justify-center text-[#6C47FF] group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</div>
+<div>
+<h3 class="text-lg font-semibold text-white">Ayuda</h3>
+<p class="text-sm text-slate-400 mt-1">Centro de soporte y preguntas frecuentes</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Option 3: Suspender cuenta -->
+<button class="flex items-center justify-between p-5 bg-[#2e3134] rounded-[20px] shadow-[0px_12px_32px_rgba(108,71,255,0.08)] hover:bg-[#383b3e] transition-colors group text-left mt-8">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#191C1F] flex items-center justify-center text-[#FF8E3C] group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="pause">pause</span>
+</div>
+<div>
+<h3 class="text-lg font-semibold text-white">Suspender cuenta</h3>
+<p class="text-sm text-slate-400 mt-1">Desactivación temporal</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Option 4: Borrar cuenta (Destructive) -->
+<button class="flex items-center justify-between p-5 bg-[#2e3134] rounded-[20px] border border-[#ba1a1a]/20 hover:border-[#ba1a1a]/50 hover:bg-[#ba1a1a]/5 transition-colors group text-left">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#191C1F] flex items-center justify-center text-[#ba1a1a] group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</div>
+<div>
+<h3 class="text-lg font-semibold text-[#ba1a1a]">Borrar cuenta</h3>
+<p class="text-sm text-slate-400 mt-1">Acción irreversible</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-500 group-hover:text-[#ba1a1a] transition-colors" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar (Settings is active under Profile semantic mapping) -->
+<nav class="bg-white/90 dark:bg-[#191C1F]/90 backdrop-blur-2xl font-['Inter'] text-[11px] font-semibold tracking-wide uppercase fixed bottom-0 w-full rounded-t-[32px] shadow-[0px_-8px_24px_rgba(83,35,230,0.06)] dark:shadow-[0px_-8px_24px_rgba(0,0,0,0.4)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 md:hidden border-t-0">
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-70 hover:opacity-100 transition-all scale-100 active:scale-95 transition-transform duration-150 gap-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span>Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-70 hover:opacity-100 transition-all scale-100 active:scale-95 transition-transform duration-150 gap-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="analytics">analytics</span>
+<span>Actividad</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-70 hover:opacity-100 transition-all scale-100 active:scale-95 transition-transform duration-150 gap-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span>
+<span>Alertas</span>
+</button>
+<!-- Active State (Profile intent) -->
+<button class="flex flex-col items-center justify-center text-[#5323E6] dark:text-[#6C47FF] bg-[#6C47FF]/10 dark:bg-[#6C47FF]/20 rounded-full px-4 py-2 hover:opacity-100 transition-all scale-100 active:scale-95 transition-transform duration-150 gap-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+<span>Perfil</span>
+</button>
+</nav>
+</body></html>

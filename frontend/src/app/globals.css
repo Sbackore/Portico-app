@@ -1,86 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
-:root {
-  /* Colors — Dark Theme */
-  --bg-primary: #0A0B1E;
-  --bg-secondary: #0F1022;
-  --bg-card: #13152B;
-  --bg-elevated: #1A1C35;
-  --border: #1E2040;
-  --border-light: #2D3060;
+@theme {
+  --color-primary: #5323e6;
+  --color-surface-tint: #5e35f1;
+  --color-on-tertiary-fixed: #341100;
+  --color-on-primary-container: #f1ebff;
+  --color-secondary-fixed: #e5deff;
+  --color-on-background: #191c1f;
+  --color-surface-dim: #d8dadf;
+  --color-outline: #797588;
+  --color-background: #f8f9fe;
+  --color-on-primary-fixed-variant: #4500d8;
+  --color-surface-container-highest: #e1e2e7;
+  --color-on-primary-fixed: #1b0063;
+  --color-on-error-container: #93000a;
+  --color-surface: #f8f9fe;
+  --color-on-secondary-container: #fffbff;
+  --color-surface-container-high: #e7e8ed;
+  --color-on-tertiary-container: #ffeae1;
+  --color-secondary: #5c44ca;
+  --color-on-surface: #191c1f;
+  --color-error-container: #ffdad6;
+  --color-inverse-primary: #c9beff;
+  --color-on-secondary: #ffffff;
+  --color-primary-fixed: #e6deff;
+  --color-on-surface-variant: #484556;
+  --color-surface-container: #edeef3;
+  --color-tertiary-container: #b34d00;
+  --color-secondary-container: #755fe5;
+  --color-surface-variant: #e1e2e7;
+  --color-on-secondary-fixed-variant: #462ab4;
+  --color-on-secondary-fixed: #1a0063;
+  --color-inverse-surface: #2e3134;
+  --color-outline-variant: #c9c3d9;
+  --color-on-primary: #ffffff;
+  --color-on-error: #ffffff;
+  --color-tertiary-fixed-dim: #ffb691;
+  --color-tertiary-fixed: #ffdbcb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-bright: #f8f9fe;
+  --color-secondary-fixed-dim: #c9bfff;
+  --color-on-tertiary: #ffffff;
+  --color-surface-container-low: #f2f3f8;
+  --color-tertiary: #8d3b00;
+  --color-primary-container: #6c47ff;
+  --color-primary-fixed-dim: #c9beff;
+  --color-inverse-on-surface: #eff0f5;
+  --color-on-tertiary-fixed-variant: #783100;
+  --color-error: #ba1a1a;
 
-  /* Brand */
-  --accent: #7B5EA7;
-  --accent-light: #A78BFA;
-  --accent-glow: rgba(123, 94, 167, 0.3);
-
-  /* Status */
-  --success: #00FF85;
-  --success-muted: #16A34A;
-  --warning: #FFD60A;
-  --danger: #FF2D55;
-  --danger-muted: #DC2626;
-  --info: #2563EB;
-  --orange: #FF6B35;
-
-  /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
-
-  /* Risk colors */
-  --risk-high: #FF2D55;
-  --risk-medium: #FF6B35;
-  --risk-low: #00FF85;
+  --font-headline: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-label: 'Inter', sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #0A0A0F; /* Deep dark background default */
+    color: #ffffff;
+    font-family: var(--font-body);
+    min-height: max(884px, 100dvh);
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
+@layer utilities {
+  .card-bg {
+    background-color: #0F1022;
+  }
 }
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  max-width: 430px;
-  margin: 0 auto;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
-
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
-  50% { box-shadow: 0 0 20px 8px var(--accent-glow); }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.animate-fade-in { animation: fadeInUp 0.35s ease both; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
