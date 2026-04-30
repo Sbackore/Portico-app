@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recuperar Contraseña - Pórtico</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#c9c3d9",
+                      "surface-container-highest": "#e1e2e7",
+                      "on-tertiary-container": "#ffeae1",
+                      "primary-fixed": "#e6deff",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#462ab4",
+                      "surface": "#f8f9fe",
+                      "on-primary-fixed": "#1b0063",
+                      "background": "#f8f9fe",
+                      "tertiary-fixed": "#ffdbcb",
+                      "on-secondary-container": "#fffbff",
+                      "secondary-fixed": "#e5deff",
+                      "on-tertiary-fixed": "#341100",
+                      "on-surface": "#191c1f",
+                      "tertiary-fixed-dim": "#ffb691",
+                      "inverse-primary": "#c9beff",
+                      "secondary": "#5c44ca",
+                      "inverse-on-surface": "#eff0f5",
+                      "tertiary": "#8d3b00",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#f8f9fe",
+                      "on-background": "#191c1f",
+                      "on-primary-fixed-variant": "#4500d8",
+                      "on-error-container": "#93000a",
+                      "secondary-container": "#755fe5",
+                      "surface-dim": "#d8dadf",
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#797588",
+                      "surface-variant": "#e1e2e7",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#484556",
+                      "secondary-fixed-dim": "#c9bfff",
+                      "surface-tint": "#5e35f1",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1a0063",
+                      "tertiary-container": "#b34d00",
+                      "surface-container": "#edeef3",
+                      "primary-fixed-dim": "#c9beff",
+                      "on-error": "#ffffff",
+                      "on-primary-container": "#f1ebff",
+                      "primary": "#5323e6",
+                      "inverse-surface": "#2e3134",
+                      "surface-container-low": "#f2f3f8",
+                      "primary-container": "#6c47ff",
+                      "on-tertiary-fixed-variant": "#783100",
+                      "surface-container-high": "#e7e8ed"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Inter", "sans-serif"],
+                      "display": ["Inter", "sans-serif"],
+                      "body": ["Inter", "sans-serif"],
+                      "label": ["Inter", "sans-serif"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-slate-950 text-white font-body min-h-screen flex flex-col items-center justify-center p-6 antialiased selection:bg-primary-container selection:text-white">
+<div class="w-full max-w-md relative z-10">
+<!-- Back Button Context -->
+<a aria-label="Volver" class="inline-flex items-center text-slate-400 hover:text-white transition-colors mb-8 group" href="#">
+<span class="material-symbols-outlined mr-2 group-active:scale-95 transition-transform">arrow_back</span>
+<span class="font-label font-semibold text-sm tracking-wide">Volver al inicio</span>
+</a>
+<!-- Logo / Brand Anchor -->
+<div class="mb-10 text-left">
+<h1 class="font-headline text-3xl font-bold tracking-tighter text-white">Pórtico</h1>
+</div>
+<!-- Hero Content Area -->
+<div class="mb-12">
+<h2 class="font-display text-[2.25rem] leading-tight font-bold tracking-[-0.02em] text-white mb-4">
+                Recuperar <br/>
+<span class="text-violet-500">Contraseña</span>
+</h2>
+<p class="font-body text-base text-slate-400 leading-[1.6]">
+                Ingresa tu correo electrónico registrado y te enviaremos las instrucciones para recuperar el acceso a tu cuenta.
+            </p>
+</div>
+<!-- Form Area -->
+<form class="space-y-6">
+<div class="space-y-2 relative group">
+<label class="block font-label font-semibold text-xs tracking-wide text-slate-300 uppercase pl-4" for="email">
+                    Correo electrónico
+                </label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-violet-500 transition-colors pointer-events-none">
+                        mail
+                    </span>
+<input class="w-full bg-slate-900 border-none rounded-[14px] py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-violet-500 focus:bg-slate-800 transition-all font-body text-base outline-none shadow-inner" id="email" placeholder="ejemplo@correo.com" required="" type="email"/>
+</div>
+</div>
+<!-- Action Area -->
+<div class="pt-8">
+<button class="w-full flex items-center justify-center bg-gradient-to-br from-[#5323E6] to-[#6C47FF] hover:opacity-90 active:scale-95 transition-all duration-200 rounded-full py-4 px-8 shadow-[0_12px_32px_rgba(108,71,255,0.15)] group" type="submit">
+<span class="font-label font-bold text-white text-base tracking-wide">Enviar Instrucciones</span>
+<span class="material-symbols-outlined ml-2 text-white/80 group-hover:translate-x-1 transition-transform">
+                        send
+                    </span>
+</button>
+</div>
+</form>
+</div>
+<!-- Background Decoration (Ambient Depth) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-violet-900/10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-violet-600/5 rounded-full blur-[120px]"></div>
+</div>
+</body></html>

@@ -1,164 +1,269 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
-import { PageLoader, Card } from '@/components/ui';
-import { Menu, UserCircle, ShoppingCart, Coffee, CreditCard, Shield, Bell, UserCheck } from 'lucide-react';
-import api from '@/lib/api';
+import { PageLoader } from '@/components/ui';
 import Link from 'next/link';
+import api from '@/lib/api';
 
-interface Dashboard {
-  nombre: string; email: string; kycEstado: string;
-  scoreSeguridadCuenta: number; alertasBadge: number;
-  ultimasTransacciones: Array<{ idTransaccion: string; comercio: string; monto: number; score?: number; fechaHora: string }>;
+interface DashboardData {
+  nombre?: string;
+  scoreSeguridadCuenta?: number;
+  kycEstado?: string;
+  alertasRecientes?: Array<{
+    id: string; comercio: string; monto: number; score: number;
+    fechaHora: string; estado: string;
+  }>;
+  notificacionesNoleidas?: number;
 }
 
-function getRiskConfig(score?: number) {
-  if (!score) return { type: 'VERIFICADA', color: 'primary', glow: 'bg-primary/10', icon: 'verified_user', badge: 'bg-primary/20 text-primary-fixed border-primary/30' };
-  if (score > 80) return { type: 'SOSPECHOSA', color: 'red', glow: 'bg-red-500/10', icon: 'warning', badge: 'bg-red-500/20 text-red-400 border-red-500/30' };
-  if (score > 60) return { type: 'PENDIENTE', color: 'orange', glow: 'bg-orange-500/10', icon: 'schedule', badge: 'bg-orange-500/20 text-orange-400 border-orange-500/30' };
-  return { type: 'VERIFICADA', color: 'primary', glow: 'bg-primary/10', icon: 'verified_user', badge: 'bg-primary/20 text-primary-fixed border-primary/30' };
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buenos días';
+  if (h < 18) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+function AlertCard({ alerta }: { alerta: NonNullable<DashboardData['alertasRecientes']>[0] }) {
+  const isHigh = alerta.score > 60;
+  const isPending = alerta.estado === 'pendiente';
+
+  const badgeStyle: React.CSSProperties = {
+    padding: '4px 12px', borderRadius: '9999px',
+    fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em',
+    textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '4px',
+    ...(isPending && isHigh
+      ? { background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }
+      : isPending
+      ? { background: 'rgba(251,146,60,0.15)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.25)' }
+      : { background: 'rgba(108,71,255,0.15)', color: '#c9beff', border: '1px solid rgba(108,71,255,0.25)' }
+    ),
+  };
+
+  const glowColor = isPending && isHigh ? 'rgba(239,68,68,0.08)' : isPending ? 'rgba(251,146,60,0.08)' : 'rgba(108,71,255,0.08)';
+
+  return (
+    <article style={{
+      background: '#0F1022', borderRadius: '20px', padding: '24px',
+      border: '1px solid rgba(255,255,255,0.04)', position: 'relative', overflow: 'hidden',
+      boxShadow: `0px 12px 32px ${glowColor}`,
+      transition: 'transform 0.15s ease',
+    }}>
+      {/* Ambient glow */}
+      <div style={{
+        position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px',
+        borderRadius: '50%', background: glowColor, filter: 'blur(40px)', pointerEvents: 'none',
+      }} />
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', position: 'relative', zIndex: 1 }}>
+        <div>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>
+            {alerta.comercio}
+          </h3>
+          <p style={{ fontSize: '13px', color: '#797588', fontWeight: 500 }}>
+            {new Date(alerta.fechaHora).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })} • {new Date(alerta.fechaHora).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+        <span style={badgeStyle}>
+          {isPending && isHigh ? '⚠ Sospechosa' : isPending ? '⏳ Pendiente' : '✓ Verificada'}
+        </span>
+      </div>
+
+      <p style={{ fontSize: '28px', fontWeight: 700, color: isPending && isHigh ? '#f87171' : '#fff', letterSpacing: '-0.02em', marginBottom: '20px', position: 'relative', zIndex: 1 }}>
+        ${alerta.monto.toLocaleString('es-CO')}{' '}
+        <span style={{ fontSize: '16px', color: '#4a4a6a', fontWeight: 500 }}>COP</span>
+      </p>
+
+      <div style={{
+        background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '14px 16px',
+        display: 'flex', flexWrap: 'wrap', gap: '16px',
+        border: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 1,
+      }}>
+        <div>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: '#4a4a6a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>ID Alerta</div>
+          <div style={{ fontSize: '13px', color: '#c9c3d9', fontFamily: 'monospace', fontWeight: 500 }}>{alerta.id.substring(0, 8).toUpperCase()}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: '#4a4a6a', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>Score</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: alerta.score > 60 ? '#f87171' : alerta.score > 40 ? '#fb923c' : '#00FF85' }}>
+            {alerta.score}/100
+          </div>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const [loadingDash, setLoadingDash] = useState(true);
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
 
-  const loadDashboard = useCallback(async () => {
+  const fetchDashboard = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await api.get(`/users/${user.uid}/dashboard`);
-      setDashboard(res.data);
-    } catch {
+      const [alertasRes] = await Promise.allSettled([
+        api.get(`/banking/alertas/${user.uid}`),
+      ]);
       setDashboard({
-        nombre: user.nombre, email: user.email,
-        kycEstado: user.kycEstado || 'PENDIENTE',
+        nombre: user.nombre,
         scoreSeguridadCuenta: user.scoreSeguridadCuenta || 100,
-        alertasBadge: 0, ultimasTransacciones: [],
+        kycEstado: user.kycEstado,
+        alertasRecientes: alertasRes.status === 'fulfilled' ? alertasRes.value.data?.slice(0, 3) : [],
       });
+    } catch {
+      setDashboard({ nombre: user.nombre, scoreSeguridadCuenta: 100, kycEstado: user.kycEstado, alertasRecientes: [] });
     } finally {
-      setLoadingDash(false);
+      setLoadingData(false);
     }
   }, [user]);
 
   useEffect(() => {
     if (!loading && !user) { router.replace('/login'); return; }
-    if (user) loadDashboard();
-  }, [user, loading, router, loadDashboard]);
+    if (user) fetchDashboard();
+  }, [user, loading, router, fetchDashboard]);
 
-  if (loading || loadingDash) return <PageLoader />;
-  if (!dashboard) return null;
+  if (loading || loadingData) return <PageLoader />;
 
-  const nombre = dashboard.nombre.split(' ')[0];
+  const firstName = dashboard?.nombre?.split(' ')[0] || 'Usuario';
+  const score = dashboard?.scoreSeguridadCuenta || 100;
+  const scoreColor = score >= 70 ? '#00FF85' : score >= 40 ? '#fb923c' : '#f87171';
 
   return (
-    <div className="font-body antialiased min-h-screen pb-32 bg-[#0A0A0F] text-white animate-fade-in">
+    <div style={{ minHeight: '100dvh', background: '#0A0B1E', color: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: '96px' }}
+      className="animate-fade-in">
+
       {/* TopAppBar */}
-      <header className="fixed top-0 z-40 bg-[#0A0A0F]/80 backdrop-blur-lg flex justify-between items-center w-full px-6 py-4 shadow-none">
-        <button className="text-primary-container hover:bg-slate-800/50 active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
-          <Menu size={24} />
+      <header style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
+        background: 'rgba(10,11,30,0.85)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '16px 24px',
+      }}>
+        <button style={{ background: 'transparent', border: 'none', color: '#6c47ff', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
         </button>
-        <h1 className="font-headline tracking-tight font-semibold text-lg text-white">
-          Principal
-        </h1>
-        <button className="hover:bg-slate-800/50 active:scale-95 duration-200 rounded-full overflow-hidden w-9 h-9 border-2 border-slate-800 flex items-center justify-center bg-slate-800">
-          <UserCircle size={24} className="text-slate-400" />
-        </button>
+        <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>Principal</h1>
+        <Link href="/perfil">
+          <div style={{
+            width: '36px', height: '36px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, #5323e6, #6c47ff)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '14px', fontWeight: 700, color: '#fff', cursor: 'pointer',
+            border: '2px solid rgba(108,71,255,0.3)',
+          }}>
+            {firstName[0]?.toUpperCase()}
+          </div>
+        </Link>
       </header>
 
-      {/* Main Content Canvas */}
-      <main className="pt-28 px-4 md:px-8 max-w-2xl mx-auto flex flex-col gap-6">
-        {/* Editorial Greeting Header */}
-        <section className="mb-4 pl-2">
-          <h2 className="text-[2.25rem] leading-tight font-display font-bold tracking-[-0.02em] text-white mb-2">
-            Hola, {nombre} 👋
+      {/* Main */}
+      <main style={{ paddingTop: '88px', padding: '88px 20px 0', maxWidth: '672px', margin: '0 auto' }}>
+
+        {/* Greeting */}
+        <section style={{ marginBottom: '32px', paddingLeft: '8px' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: 700, letterSpacing: '-0.025em', color: '#fff', marginBottom: '8px', lineHeight: '1.15' }}>
+            {getGreeting()}, {firstName} 👋
           </h2>
-          <p className="text-surface-dim text-base font-body">
+          <p style={{ color: '#797588', fontSize: '16px' }}>
             Revisa la actividad reciente de tus cuentas.
           </p>
         </section>
 
-        {/* Quick Actions (Adapted to match design language) */}
-        <div className="grid grid-cols-2 gap-3 mb-2">
-          <Link href="/banking/vincular">
-            <Card className="flex flex-col gap-2 hover:border-[#2D3060] p-4 bg-[#0F1022]">
-              <CreditCard size={20} className="text-blue-400" />
-              <span className="text-sm text-white font-semibold font-label">Vincular banco</span>
-            </Card>
-          </Link>
-          <Link href="/kyc">
-            <Card className="flex flex-col gap-2 hover:border-[#2D3060] p-4 bg-[#0F1022]">
-              <UserCheck size={20} className="text-primary-fixed-dim" />
-              <span className="text-sm text-white font-semibold font-label">KYC</span>
-            </Card>
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+          {/* Security score */}
+          <div style={{
+            background: '#0F1022', borderRadius: '20px', padding: '20px',
+            border: '1px solid rgba(255,255,255,0.04)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#797588', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+              Score de seguridad
+            </p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+              <span style={{ fontSize: '32px', fontWeight: 700, color: scoreColor, letterSpacing: '-0.02em' }}>{score}</span>
+              <span style={{ fontSize: '16px', color: '#4a4a6a', fontWeight: 500 }}>/100</span>
+            </div>
+            <div style={{ marginTop: '12px', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${score}%`, background: scoreColor, borderRadius: '9999px', transition: 'width 1s ease' }} />
+            </div>
+          </div>
+
+          {/* KYC status */}
+          <div style={{
+            background: '#0F1022', borderRadius: '20px', padding: '20px',
+            border: '1px solid rgba(255,255,255,0.04)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#797588', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+              Estado KYC
+            </p>
+            <span style={{
+              display: 'inline-block', padding: '4px 12px', borderRadius: '9999px',
+              fontSize: '12px', fontWeight: 600,
+              ...(dashboard?.kycEstado === 'APROBADO'
+                ? { background: 'rgba(0,255,133,0.12)', color: '#00FF85', border: '1px solid rgba(0,255,133,0.2)' }
+                : { background: 'rgba(251,146,60,0.12)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.2)' }
+              )
+            }}>
+              {dashboard?.kycEstado === 'APROBADO' ? '✓ Verificado' : '⏳ Pendiente'}
+            </span>
+            <Link href="/kyc">
+              <p style={{ color: '#6c47ff', fontSize: '12px', fontWeight: 600, marginTop: '10px', cursor: 'pointer' }}>
+                {dashboard?.kycEstado !== 'APROBADO' ? 'Verificar ahora →' : 'Ver detalles →'}
+              </p>
+            </Link>
+          </div>
+        </div>
+
+        {/* Alerts section header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingLeft: '4px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>
+            Alertas recientes
+          </h3>
+          <Link href="/banking">
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#6c47ff', cursor: 'pointer' }}>Ver todo</span>
           </Link>
         </div>
 
-        {/* Alert Cards List (Transactions) */}
-        <div className="flex flex-col gap-6">
-          {dashboard.ultimasTransacciones.length === 0 ? (
-             <article className="card-bg rounded-[20px] p-6 shadow-md text-center py-10 border border-slate-800/50">
-               <ShoppingCart size={32} className="text-slate-600 mx-auto mb-3" />
-               <p className="text-slate-400 text-sm font-medium">Sin transacciones recientes</p>
-             </article>
+        {/* Alert cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {dashboard?.alertasRecientes && dashboard.alertasRecientes.length > 0 ? (
+            dashboard.alertasRecientes.map(a => (
+              <AlertCard key={a.id} alerta={a} />
+            ))
           ) : (
-            dashboard.ultimasTransacciones.map((txn, index) => {
-              const config = getRiskConfig(txn.score);
-              const icon = index % 2 === 0 ? <ShoppingCart size={24} /> : <Coffee size={24} />;
-              
-              return (
-                <article key={txn.idTransaccion} className="card-bg rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-transform duration-200 active:scale-[0.98]">
-                  {/* Ambient Glow */}
-                  <div className={`absolute top-0 right-0 w-32 h-32 ${config.glow} rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none`}></div>
-                  
-                  <div className="flex justify-between items-start mb-4 relative z-10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#1A1A24] flex items-center justify-center text-slate-300">
-                        {icon}
-                      </div>
-                      <div>
-                        <h3 className="font-headline font-semibold text-lg text-white">{txn.comercio}</h3>
-                        <p className="text-sm text-surface-dim font-medium">Transacción</p>
-                      </div>
-                    </div>
-                    <div className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 border ${config.badge}`}>
-                      <span className="text-xs font-label font-semibold tracking-wide uppercase">{config.type}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-5 relative z-10">
-                    <p className="text-[1.75rem] font-display font-bold text-white tracking-tight">
-                      ${txn.monto.toLocaleString('es-CO')} <span className="text-lg text-surface-dim font-medium ml-1">COP</span>
-                    </p>
-                  </div>
-                  
-                  <div className="bg-[#1A1A24] rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-surface-dim relative z-10 border border-slate-700/50">
-                    <div className="flex flex-col">
-                      <span className="font-label font-semibold text-slate-500 mb-0.5">Fecha/Hora</span>
-                      <span className="font-medium text-slate-300">{new Date(txn.fechaHora).toLocaleString('es-CO', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    {txn.score !== undefined && (
-                      <div className="flex flex-col">
-                        <span className="font-label font-semibold text-slate-500 mb-0.5">Score</span>
-                        <span className="font-mono font-medium text-slate-300">{txn.score}/100</span>
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="font-label font-semibold text-slate-500 mb-0.5">ID TRX</span>
-                      <span className="font-mono font-medium text-slate-300">{txn.idTransaccion.substring(0,8).toUpperCase()}</span>
-                    </div>
-                  </div>
-                </article>
-              );
-            })
+            <div style={{
+              background: '#0F1022', borderRadius: '20px', padding: '48px 24px',
+              border: '1px solid rgba(255,255,255,0.04)', textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '40px', marginBottom: '16px' }}>🛡️</div>
+              <p style={{ color: '#fff', fontWeight: 600, fontSize: '16px', marginBottom: '8px' }}>Todo tranquilo</p>
+              <p style={{ color: '#797588', fontSize: '14px', lineHeight: '1.6', maxWidth: '220px', margin: '0 auto 24px' }}>
+                Sin alertas recientes. ¡Tu cuenta está protegida!
+              </p>
+              <Link href="/banking">
+                <button style={{
+                  padding: '12px 24px', borderRadius: '9999px',
+                  background: 'linear-gradient(135deg, #5323e6, #6c47ff)',
+                  color: '#fff', fontWeight: 600, fontSize: '14px',
+                  border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                }}>
+                  Simular transacción
+                </button>
+              </Link>
+            </div>
           )}
         </div>
       </main>
 
-      <BottomNav alertaBadge={dashboard.alertasBadge} />
+      <BottomNav />
     </div>
   );
 }

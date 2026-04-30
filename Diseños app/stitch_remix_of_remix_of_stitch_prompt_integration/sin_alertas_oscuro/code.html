@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transacciones - Sin Alertas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-surface-variant": "#484556",
+                "on-secondary-fixed-variant": "#462ab4",
+                "tertiary-fixed-dim": "#ffb691",
+                "tertiary-container": "#b34d00",
+                "surface-container-lowest": "#ffffff",
+                "surface-tint": "#5e35f1",
+                "on-error-container": "#93000a",
+                "surface-container-low": "#f2f3f8",
+                "on-secondary": "#ffffff",
+                "secondary": "#5c44ca",
+                "on-surface": "#191c1f",
+                "surface-container": "#edeef3",
+                "surface-variant": "#e1e2e7",
+                "surface-dim": "#d8dadf",
+                "on-background": "#191c1f",
+                "primary": "#5323e6",
+                "on-primary-fixed": "#1b0063",
+                "background": "#f8f9fe",
+                "on-primary-fixed-variant": "#4500d8",
+                "tertiary-fixed": "#ffdbcb",
+                "on-tertiary-container": "#ffeae1",
+                "surface-container-high": "#e7e8ed",
+                "inverse-on-surface": "#eff0f5",
+                "error-container": "#ffdad6",
+                "secondary-container": "#755fe5",
+                "primary-fixed-dim": "#c9beff",
+                "on-secondary-fixed": "#1a0063",
+                "on-tertiary-fixed-variant": "#783100",
+                "surface": "#f8f9fe",
+                "tertiary": "#8d3b00",
+                "on-secondary-container": "#fffbff",
+                "inverse-primary": "#c9beff",
+                "primary-container": "#6c47ff",
+                "surface-bright": "#f8f9fe",
+                "outline": "#797588",
+                "error": "#ba1a1a",
+                "on-tertiary": "#ffffff",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#341100",
+                "outline-variant": "#c9c3d9",
+                "on-error": "#ffffff",
+                "surface-container-highest": "#e1e2e7",
+                "secondary-fixed-dim": "#c9bfff",
+                "secondary-fixed": "#e5deff",
+                "primary-fixed": "#e6deff",
+                "on-primary-container": "#f1ebff",
+                "inverse-surface": "#2e3134"
+        },
+        "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Inter"
+                ],
+                "display": [
+                        "Inter"
+                ],
+                "body": [
+                        "Inter"
+                ],
+                "label": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+    body {
+        background-color: #0A0B1E;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="text-white min-h-screen flex flex-col relative pb-[90px]">
+<!-- TopAppBar -->
+<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl docked full-width top-0 sticky z-50 no-border shadow-sm shadow-[0px_12px_32px_rgba(108,71,255,0.08)] flex justify-between items-center w-full px-6 py-4 !bg-[#0A0B1E]/80 border-b border-white/5">
+<button class="scale-95 active:scale-90 transition-transform hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-white text-[28px]" data-icon="menu">menu</span>
+</button>
+<h1 class="font-['Inter'] font-bold text-xl tracking-tight text-white">Transacciones</h1>
+<button class="scale-95 active:scale-90 transition-transform hover:opacity-80 transition-opacity w-[36px] h-[36px] rounded-full overflow-hidden border-2 border-primary-container/30">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Portrait of a young professional woman with natural makeup, soft lighting, warm background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbOLLPb9xBsQfTLtocomzP7JMnCm5WDcwvN8CLnp-nn5koNUzwhbkmmyrEVqv8Hb4n0zTw2AWNcvHoBxcNMfg-rfh6cbJbX9G-aLwoIW3L_kzJd6A1MwMTAHH1JsjV1fRfJwweqZf6tBlGBstkEcFLLiH1Az9rBPp7ytdvx_S44W0K551UWH_z72HTy5gPsQfMsE8TCl6ZUsZiOwUuO2-tQwNf9KH-6YYhQ_woWE6lq2gaVpmhS9zPPlFI6YI1iA8LPBy8hYmTVYs"/>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col px-6 pt-8 pb-12">
+<!-- Empty State Container -->
+<div class="flex-grow flex flex-col items-center justify-center pt-20 pb-32">
+<div class="w-24 h-24 rounded-full bg-primary-container/10 flex items-center justify-center mb-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)]">
+<span class="material-symbols-outlined text-primary-container text-[48px] opacity-80" data-icon="notifications_off" data-weight="fill" style="font-variation-settings: 'FILL' 1;">notifications_off</span>
+</div>
+<h2 class="font-['Inter'] font-bold text-2xl tracking-tight text-white mb-3">Sin alertas</h2>
+<p class="font-['Inter'] text-[15px] text-white/60 text-center max-w-[280px] leading-relaxed">
+                No tienes transacciones recientes ni notificaciones pendientes en este momento.
+            </p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-zinc-950/90 backdrop-blur-2xl rounded-t-[20px] shadow-[0px_-8px_24px_rgba(108,71,255,0.06)] md:hidden">
+<!-- Inicio (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide uppercase">Inicio</span>
+</button>
+<!-- Transacciones (Active) -->
+<button class="flex flex-col items-center justify-center text-violet-400 bg-violet-500/10 rounded-2xl px-4 py-2 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="receipt_long" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-inter text-[11px] font-medium tracking-wide uppercase">Transacciones</span>
+</button>
+<!-- Configuración (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-inter text-[11px] font-medium tracking-wide uppercase">Configuración</span>
+</button>
+<!-- Perfil (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide uppercase">Perfil</span>
+</button>
+</nav>
+</body></html>

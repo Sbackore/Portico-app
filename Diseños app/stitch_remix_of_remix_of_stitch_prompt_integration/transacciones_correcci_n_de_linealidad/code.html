@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transacciones - The Digital Sanctuary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#5323e6",
+                        "surface-tint": "#5e35f1",
+                        "on-tertiary-fixed": "#341100",
+                        "on-primary-container": "#f1ebff",
+                        "secondary-fixed": "#e5deff",
+                        "on-background": "#191c1f",
+                        "surface-dim": "#d8dadf",
+                        "outline": "#797588",
+                        "background": "#f8f9fe",
+                        "on-primary-fixed-variant": "#4500d8",
+                        "surface-container-highest": "#e1e2e7",
+                        "on-primary-fixed": "#1b0063",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9fe",
+                        "on-secondary-container": "#fffbff",
+                        "surface-container-high": "#e7e8ed",
+                        "on-tertiary-container": "#ffeae1",
+                        "secondary": "#5c44ca",
+                        "on-surface": "#191c1f",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#c9beff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#e6deff",
+                        "on-surface-variant": "#484556",
+                        "surface-container": "#edeef3",
+                        "tertiary-container": "#b34d00",
+                        "secondary-container": "#755fe5",
+                        "surface-variant": "#e1e2e7",
+                        "on-secondary-fixed-variant": "#462ab4",
+                        "on-secondary-fixed": "#1a0063",
+                        "inverse-surface": "#2e3134",
+                        "outline-variant": "#c9c3d9",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "tertiary-fixed": "#ffdbcb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f8f9fe",
+                        "secondary-fixed-dim": "#c9bfff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f2f3f8",
+                        "tertiary": "#8d3b00",
+                        "primary-container": "#6c47ff",
+                        "primary-fixed-dim": "#c9beff",
+                        "inverse-on-surface": "#eff0f5",
+                        "on-tertiary-fixed-variant": "#783100",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    /* Base styles forcing dark mode appearance as requested */
+    body {
+        background-color: #0A0B1E;
+        color: #ffffff;
+    }
+    .card-bg {
+        background-color: #0F1022;
+    }
+</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body antialiased min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed docked full-width top-0 z-40 bg-zinc-950/80 backdrop-blur-lg flex justify-between items-center w-full px-6 py-4 shadow-none no-border bg-zinc-900/50">
+<button class="text-violet-500 dark:text-violet-400 hover:bg-zinc-800/50 scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-inter tracking-tight font-semibold text-lg text-white tracking-tighter">
+            Transacciones
+        </h1>
+<button class="hover:bg-zinc-800/50 scale-95 duration-200 rounded-full overflow-hidden w-9 h-9 border-2 border-zinc-800 flex items-center justify-center">
+<img alt="Profile Avatar" class="w-full h-full object-cover" data-alt="close up portrait of a young professional in soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3GHSVM1VkbXsaEU7JZLshc3uioY8IJ6-fWdJm6sUFRa-_V2X-H_3GH6QBjF7br2E4575260I_VvmMwKzZcBWHBmgqUJSFNtG9Q305MGN0J2n7I2wCsMOyagZws_FTf4eZfDIE3LaLvcgFtLa3WOZq-1u1H7KQakkfFy_UN6G6SSaRNJaSAW8QqhtCwl2pLoRsLasd4e4yXx07RxzRb9pj4d6mG6MgDQvJHwYZsQgp0WzlTCoCAxiUXOzLrggC0LnsUN4JHJeuxfk"/>
+</button>
+</header>
+<!-- Main Content -->
+<main class="pt-28 px-4 md:px-8 max-w-2xl mx-auto">
+<!-- Transaction List -->
+<div class="flex flex-col gap-6">
+<!-- Card 1: High Risk -->
+<article class="card-bg rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-transform duration-200 active:scale-[0.98]">
+<div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div>
+<h2 class="font-headline font-semibold text-lg text-white">Mercado Libre</h2>
+<p class="text-sm text-slate-400 font-medium">12 Oct 2023 • 14:30</p>
+</div>
+<div class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-red-500/30">
+<span class="text-xs font-label font-semibold tracking-wide uppercase">RIESGO ALTO</span>
+</div>
+</div>
+<div class="mb-5 relative z-10">
+<p class="text-[1.75rem] font-display font-bold text-red-400 tracking-tight">-$4.500.000</p>
+</div>
+<div class="bg-slate-800/30 rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-slate-300 relative z-10 border border-slate-700/50 mb-6">
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Alerta</span>
+<span class="font-mono font-medium text-slate-300">AL-8924-M</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Transacción</span>
+<span class="font-mono font-medium text-slate-300">TRX-7749201</span>
+</div>
+</div>
+<div class="flex gap-4 relative z-10">
+<button class="flex-1 py-3 px-6 rounded-full bg-primary text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.2)]">Verificar</button>
+<button class="flex-1 py-3 px-6 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50">Bloquear / Reportar</button>
+</div>
+</article>
+<!-- Card 2: Pending -->
+<article class="card-bg rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-transform duration-200 active:scale-[0.98]">
+<div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div>
+<h2 class="font-headline font-semibold text-lg text-white">Uber BV</h2>
+<p class="text-sm text-slate-400 font-medium">11 Oct 2023 • 08:15</p>
+</div>
+<div class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-orange-500/30">
+<span class="text-xs font-label font-semibold tracking-wide uppercase">PENDIENTE</span>
+</div>
+</div>
+<div class="mb-5 relative z-10">
+<p class="text-[1.75rem] font-display font-bold text-white tracking-tight">-$24.500</p>
+</div>
+<div class="bg-slate-800/30 rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-slate-300 relative z-10 border border-slate-700/50 mb-6">
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Alerta</span>
+<span class="font-mono font-medium text-slate-300">--</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Transacción</span>
+<span class="font-mono font-medium text-slate-300">TRX-7748190</span>
+</div>
+</div>
+<div class="flex gap-4 relative z-10">
+<button class="flex-1 py-3 px-6 rounded-full bg-primary text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.2)]">Verificar</button>
+<button class="flex-1 py-3 px-6 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50">Bloquear / Reportar</button>
+</div>
+</article>
+<!-- Card 3: Verified -->
+<article class="card-bg rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-transform duration-200 active:scale-[0.98]">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div>
+<h2 class="font-headline font-semibold text-lg text-white">Netflix.com</h2>
+<p class="text-sm text-slate-400 font-medium">10 Oct 2023 • 22:00</p>
+</div>
+<div class="bg-primary/20 text-primary-fixed px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-primary/30">
+<span class="text-xs font-label font-semibold tracking-wide uppercase">VERIFICADA</span>
+</div>
+</div>
+<div class="mb-5 relative z-10">
+<p class="text-[1.75rem] font-display font-bold text-white tracking-tight">-$38.900</p>
+</div>
+<div class="bg-slate-800/30 rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-slate-300 relative z-10 border border-slate-700/50 mb-6">
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Alerta</span>
+<span class="font-mono font-medium text-slate-300">--</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label font-semibold text-slate-500 mb-0.5">ID Transacción</span>
+<span class="font-mono font-medium text-slate-300">TRX-7747002</span>
+</div>
+</div>
+<div class="flex gap-4 relative z-10">
+<button class="flex-1 py-3 px-6 rounded-full bg-primary text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.2)]">Verificar</button>
+<button class="flex-1 py-3 px-6 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50">Bloquear / Reportar</button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-zinc-950/90 backdrop-blur-2xl rounded-t-[20px] shadow-[0px_-8px_24px_rgba(108,71,255,0.06)] md:hidden">
+<!-- Inicio (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Inicio</span>
+</button>
+<!-- Transacciones (Active) -->
+<button class="flex flex-col items-center justify-center text-violet-400 bg-violet-500/10 rounded-2xl px-4 py-2 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="receipt_long" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Transacciones</span>
+</button>
+<!-- Configuración (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Configuración</span>
+</button>
+<!-- Perfil (Inactive) -->
+<button class="flex flex-col items-center justify-center text-zinc-500 px-4 py-2 hover:text-zinc-300 scale-98 active:scale-95 transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Perfil</span>
+</button>
+</nav>
+</body></html>
