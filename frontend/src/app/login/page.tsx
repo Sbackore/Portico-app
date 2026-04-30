@@ -115,11 +115,6 @@ export default function LoginPage() {
               Iniciar sesión
             </Button>
           </div>
-          
-          {/* Demo hint */}
-          <div className="bg-[#1A1A24] border border-outline/20 rounded-xl p-3 text-xs text-surface-dim text-center mt-2">
-            Modo demo activo · Usa correo falso y clave libre
-          </div>
         </form>
 
         {/* Footer */}

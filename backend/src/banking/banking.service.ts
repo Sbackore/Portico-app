@@ -5,6 +5,14 @@ import { FirestoreService } from '../shared/firestore/firestore.service';
 import { WebhookTransaccionDto } from './dto/webhook-transaccion.dto';
 import { FieldValue } from 'firebase-admin/firestore';
 
+interface SimularTransaccionInput {
+  userId: string;
+  monto: number;
+  comercio: string;
+  ubicacion?: string;
+  factorDispositivo?: number;
+}
+
 @Injectable()
 export class BankingService {
   private readonly logger = new Logger(BankingService.name);
@@ -27,23 +35,14 @@ export class BankingService {
     countUltimas4h: number,
     factorDispositivo: number = 0,
   ): number {
-    // A — Anomalía de monto: qué tan desviado está respecto al promedio
     let A = 0;
     if (promedioHistorico > 0) {
       const desviacion = Math.abs(monto - promedioHistorico) / promedioHistorico;
       A = Math.min(desviacion * 100, 100);
     }
-
-    // L — Inconsistencia de ubicación: placeholder (100 = distancia muy grande)
-    // En producción recibir las coordenadas y calcular distancia desde última txn
     const L = 0;
-
-    // V — Velocidad: más de 5 transacciones en 4h = riesgo máximo
     const V = Math.min(countUltimas4h * 20, 100);
-
-    // D — Factor de dispositivo (viene delDTO)
     const D = factorDispositivo;
-
     const score = 0.35 * A + 0.25 * L + 0.25 * V + 0.15 * D;
     return Math.round(score);
   }
@@ -71,16 +70,12 @@ export class BankingService {
     });
 
     // 2. Obtener historial reciente del usuario (últimas 30 txns)
-    // NOTA: Se omite .orderBy() para no requerir índice compuesto en Firestore.
-    // El ordenamiento por fechaHora se hace en memoria tras el fetch.
     const historial = await db
       .collection('transacciones_raw')
       .where('userId', '==', dto.userId)
       .limit(30)
       .get();
 
-
-    // Calcular promedio histórico de montos
     let totalMonto = 0;
     let countUltimas4h = 0;
     const hace4h = Date.now() - 4 * 60 * 60 * 1000;
@@ -124,18 +119,21 @@ export class BankingService {
         colorIndicador = 'AMARILLO';
       }
 
-      await db.collection('alertas_transacciones').add({
+      const alertaRef = await db.collection('alertas_transacciones').add({
         idTransaccion: dto.idTransaccion,
         userId: dto.userId,
         monto: dto.monto,
         comercio: dto.comercio,
-        fechaHora: new Date(dto.fechaHora),
-        puntajeRiesgo: score,
+        fechaHora: dto.fechaHora,
+        ubicacion: dto.ubicacion || null,
+        score,
         nivelUrgencia,
         estadoAlerta: 'PENDIENTE',
         colorIndicador,
         creadoEn: FieldValue.serverTimestamp(),
       });
+      // Actualizar el id del documento con su propio ID de Firestore
+      await alertaRef.update({ id: alertaRef.id });
 
       this.logger.warn(
         `Alerta creada para ${dto.userId}: score=${score}, nivel=${nivelUrgencia}, monto=${dto.monto}`,
@@ -147,8 +145,76 @@ export class BankingService {
   }
 
   /**
+   * Simula una transacción bancaria generando un ID automático.
+   * Útil para crear datos de prueba desde el frontend.
+   */
+  async simularTransaccion(
+    input: SimularTransaccionInput,
+  ): Promise<{ processed: boolean; score: number; idTransaccion: string }> {
+    const idTransaccion = `TRX-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const fechaHora = new Date().toISOString();
+
+    const result = await this.procesarWebhookTransaccion({
+      userId: input.userId,
+      idTransaccion,
+      monto: input.monto,
+      comercio: input.comercio,
+      fechaHora,
+      ubicacion: input.ubicacion,
+      factorDispositivo: input.factorDispositivo ?? 0,
+    });
+
+    return { ...result, idTransaccion };
+  }
+
+  /**
+   * Retorna las alertas de transacciones del usuario desde Firestore.
+   */
+  async getAlertas(userId: string): Promise<object[]> {
+    const db = this.firestoreService.getDb();
+    const snap = await db
+      .collection('alertas_transacciones')
+      .where('userId', '==', userId)
+      .limit(50)
+      .get();
+
+    const alertas = snap.docs.map((doc) => {
+      const data = doc.data();
+      // Normalizar fechaHora que puede ser Timestamp, Date o string
+      let fechaHora: string;
+      if (data.fechaHora && typeof data.fechaHora.toDate === 'function') {
+        fechaHora = data.fechaHora.toDate().toISOString();
+      } else if (data.fechaHora instanceof Date) {
+        fechaHora = data.fechaHora.toISOString();
+      } else if (typeof data.fechaHora === 'string') {
+        fechaHora = data.fechaHora;
+      } else {
+        fechaHora = new Date().toISOString();
+      }
+
+      return {
+        id: doc.id,
+        idTransaccion: data.idTransaccion || doc.id,
+        comercio: data.comercio || 'Comercio desconocido',
+        monto: data.monto || 0,
+        score: data.score || data.puntajeRiesgo || 0,
+        fechaHora,
+        estado: (data.estadoAlerta || 'pendiente').toLowerCase(),
+        ubicacion: data.ubicacion || null,
+      };
+    });
+
+    // Ordenar en memoria por fecha descendente
+    alertas.sort(
+      (a, b) =>
+        new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime(),
+    );
+
+    return alertas;
+  }
+
+  /**
    * Crea un Recurrent Link en Antigravity Banking para el usuario.
-   * El usuario debe haber completado el flujo OAuth de Antigravity previamente.
    */
   async crearRecurrentLink(
     userId: string,
@@ -169,8 +235,6 @@ export class BankingService {
       );
       linkId = (response.data as { linkId: string }).linkId;
     }
-
-    // Guardar el linkId en Firestore
 
     await db
       .collection('cuentas_bancarias')

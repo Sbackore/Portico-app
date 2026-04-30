@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Put,
+  Get,
   Body,
   Param,
   HttpCode,
@@ -23,6 +24,15 @@ export class NotificacionesController {
   @HttpCode(HttpStatus.OK)
   enviarNotificacion(@Body() dto: EnviarNotificacionDto) {
     return this.notificacionesService.enviarNotificacion(dto);
+  }
+
+  /**
+   * GET /notificaciones/historial/:userId
+   * Retorna el historial de notificaciones del usuario desde Firestore.
+   */
+  @Get('historial/:userId')
+  getHistorial(@Param('userId') userId: string) {
+    return this.notificacionesService.getHistorial(userId);
   }
 
   /**

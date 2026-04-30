@@ -1,7 +1,9 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
+  Param,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -16,11 +18,19 @@ export class RaspController {
    * POST /rasp/webhook
    * Recibe alertas del SDK Antigravity Shield (RASP).
    * Registra la amenaza y toma acción automática según la severidad.
-   * En amenazas CRÍTICAS (ROOT, HOOK) bloquea las sesiones del usuario por 2h.
    */
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   procesarAlertaRasp(@Body() dto: AlertaRaspDto) {
     return this.raspService.procesarAlertaRasp(dto);
+  }
+
+  /**
+   * GET /rasp/estado/:userId
+   * Retorna el score de seguridad y amenazas recientes del usuario.
+   */
+  @Get('estado/:userId')
+  getEstado(@Param('userId') userId: string) {
+    return this.raspService.getEstado(userId);
   }
 }

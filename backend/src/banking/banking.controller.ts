@@ -1,7 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
 import { BankingService } from './banking.service';
 import { WebhookTransaccionDto } from './dto/webhook-transaccion.dto';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 class CrearLinkDto {
   @IsString()
@@ -11,6 +11,27 @@ class CrearLinkDto {
   @IsString()
   @IsNotEmpty()
   authCode: string;
+}
+
+class SimularTransaccionDto {
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
+  @IsNumber()
+  monto: number;
+
+  @IsString()
+  @IsNotEmpty()
+  comercio: string;
+
+  @IsString()
+  @IsOptional()
+  ubicacion?: string;
+
+  @IsNumber()
+  @IsOptional()
+  factorDispositivo?: number;
 }
 
 @Controller('banking')
@@ -29,9 +50,28 @@ export class BankingController {
   }
 
   /**
+   * POST /banking/simular
+   * Simula una transacción bancaria para pruebas/demo.
+   * Genera un ID automático y procesa el webhook internamente.
+   */
+  @Post('simular')
+  @HttpCode(HttpStatus.OK)
+  simularTransaccion(@Body() dto: SimularTransaccionDto) {
+    return this.bankingService.simularTransaccion(dto);
+  }
+
+  /**
+   * GET /banking/alertas/:userId
+   * Retorna las alertas de transacciones del usuario desde Firestore.
+   */
+  @Get('alertas/:userId')
+  getAlertas(@Param('userId') userId: string) {
+    return this.bankingService.getAlertas(userId);
+  }
+
+  /**
    * POST /banking/link
    * Crea un Recurrent Link en Antigravity Banking para el usuario.
-   * El authCode lo provee la app móvil tras completar el flujo OAuth.
    */
   @Post('link')
   @HttpCode(HttpStatus.CREATED)

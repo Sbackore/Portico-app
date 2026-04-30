@@ -34,7 +34,6 @@ export class NotificacionesService {
     const endpoint = this.configService.get<string>('AG_NOTIFY_ENDPOINT');
     const apiKey = this.configService.get<string>('AG_NOTIFY_API_KEY') || 'REEMPLAZAR';
 
-    // Obtener FCM token y config de notificaciones del usuario
     const [userSnap, configSnap] = await Promise.all([
       db.collection('usuarios').doc(dto.userId).get(),
       db.collection('notificaciones_config').doc(dto.userId).get(),
@@ -43,7 +42,6 @@ export class NotificacionesService {
     const fcmToken = userSnap.data()?.fcmToken;
     const config = configSnap.data();
 
-    // Si el usuario no tiene permisos activos y no es urgencia forzada, omitir
     if (!config?.permisoNotificacionesActivo && dto.nivelUrgencia !== 'INMEDIATA') {
       this.logger.warn(
         `Notificación omitida para ${dto.userId}: permisos desactivados`,
@@ -75,26 +73,75 @@ export class NotificacionesService {
       });
     }
 
-
-    // Persistir la entrega en Firestore (solo cuando la API real está activa)
-    if (!apiKey.includes('REEMPLAZAR')) {
-      await db.collection('notificaciones_enviadas').add({
-        ...payload,
-        enviadaEn: FieldValue.serverTimestamp(),
-        estado: 'ENTREGADA',
-      });
-    } else {
-      this.logger.log(
-        `[Simulación] Notificación registrada solo en log (BD no disponible en modo prueba).`,
-      );
-    }
-
+    // Persistir siempre en Firestore para que el historial sea visible
+    await db.collection('notificaciones_enviadas').add({
+      userId: dto.userId,
+      mensaje: `${emoji} ${payload.cuerpo}`,
+      nivelUrgencia: dto.nivelUrgencia,
+      comercio: dto.comercio,
+      monto: dto.monto,
+      alertaId: dto.alertaId,
+      canalesUsados: canales,
+      leida: false,
+      enviado: !apiKey.includes('REEMPLAZAR'),
+      fechaHora: new Date().toISOString(),
+      enviadaEn: FieldValue.serverTimestamp(),
+    });
 
     this.logger.log(
       `Notificación enviada a ${dto.userId}: nivel=${dto.nivelUrgencia}, canales=${canales.join(',')}`,
     );
 
     return { enviado: true, canalesUsados: canales };
+  }
+
+  /**
+   * Retorna el historial de notificaciones del usuario desde Firestore.
+   */
+  async getHistorial(userId: string): Promise<object[]> {
+    const db = this.firestoreService.getDb();
+
+    const snap = await db
+      .collection('notificaciones_enviadas')
+      .where('userId', '==', userId)
+      .limit(50)
+      .get();
+
+    const notificaciones = snap.docs.map((doc) => {
+      const data = doc.data();
+
+      // Normalizar fechaHora
+      let fechaHora: string;
+      if (data.fechaHora && typeof data.fechaHora.toDate === 'function') {
+        fechaHora = data.fechaHora.toDate().toISOString();
+      } else if (data.enviadaEn && typeof data.enviadaEn.toDate === 'function') {
+        fechaHora = data.enviadaEn.toDate().toISOString();
+      } else if (typeof data.fechaHora === 'string') {
+        fechaHora = data.fechaHora;
+      } else {
+        fechaHora = new Date().toISOString();
+      }
+
+      return {
+        id: doc.id,
+        alertaId: data.alertaId || doc.id,
+        comercio: data.comercio || null,
+        monto: data.monto || null,
+        nivelUrgencia: data.nivelUrgencia || 'INFORMATIVA',
+        mensaje: data.mensaje || data.cuerpo || 'Notificación recibida',
+        fechaHora,
+        leida: data.leida ?? false,
+        enviado: data.enviado ?? true,
+      };
+    });
+
+    // Ordenar por fecha descendente
+    notificaciones.sort(
+      (a, b) =>
+        new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime(),
+    );
+
+    return notificaciones;
   }
 
   /**
