@@ -19,7 +19,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (nombre: string, email: string, password: string, telefono?: string) => Promise<void>;
+  register: (nombre: string, documento: string, email: string, password: string, telefono?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -55,19 +55,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/home');
   };
 
-  const register = async (nombre: string, email: string, password: string, telefono?: string) => {
-    const res = await api.post('/auth/register', { nombre, email, password, telefono });
+  const register = async (nombre: string, documento: string, email: string, password: string, telefono?: string) => {
+    const res = await api.post('/auth/register', { nombre, documento, email, password, telefono });
     persist(res.data.token, res.data.user);
     router.push('/home');
   };
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    if (token) {
+      try {
+        await api.post('/auth/logout', {});
+      } catch (e) { /* ignorar error si falla red */ }
+    }
     localStorage.removeItem('portico_token');
     localStorage.removeItem('portico_user');
     setToken(null);
     setUser(null);
     router.push('/login');
-  }, [router]);
+  }, [router, token]);
 
   const refreshUser = useCallback(async () => {
     if (!user) return;

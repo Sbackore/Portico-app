@@ -103,42 +103,40 @@ export class BankingService {
     const configDoc = await db.collection('config_monitoreo').doc(dto.userId).get();
     const umbralUsuario = configDoc.data()?.montoUmbralAlerta ?? umbralDefault;
 
-    // 5. Crear alerta si el score o el monto supera el umbral
-    if (score > 40 || dto.monto > umbralUsuario) {
-      let nivelUrgencia: string;
-      let colorIndicador: string;
+    // 5. Crear alerta siempre (para fines de demostración en el prototipo)
+    let nivelUrgencia: string;
+    let colorIndicador: string;
 
-      if (score > 80) {
-        nivelUrgencia = 'INMEDIATA';
-        colorIndicador = 'ROJO';
-      } else if (score > 60) {
-        nivelUrgencia = 'ALTA';
-        colorIndicador = 'NARANJA';
-      } else {
-        nivelUrgencia = 'MODERADA';
-        colorIndicador = 'AMARILLO';
-      }
-
-      const alertaRef = await db.collection('alertas_transacciones').add({
-        idTransaccion: dto.idTransaccion,
-        userId: dto.userId,
-        monto: dto.monto,
-        comercio: dto.comercio,
-        fechaHora: dto.fechaHora,
-        ubicacion: dto.ubicacion || null,
-        score,
-        nivelUrgencia,
-        estadoAlerta: 'PENDIENTE',
-        colorIndicador,
-        creadoEn: FieldValue.serverTimestamp(),
-      });
-      // Actualizar el id del documento con su propio ID de Firestore
-      await alertaRef.update({ id: alertaRef.id });
-
-      this.logger.warn(
-        `Alerta creada para ${dto.userId}: score=${score}, nivel=${nivelUrgencia}, monto=${dto.monto}`,
-      );
+    if (score > 80) {
+      nivelUrgencia = 'INMEDIATA';
+      colorIndicador = 'ROJO';
+    } else if (score > 60) {
+      nivelUrgencia = 'ALTA';
+      colorIndicador = 'NARANJA';
+    } else {
+      nivelUrgencia = 'MODERADA';
+      colorIndicador = 'AMARILLO';
     }
+
+    const alertaRef = await db.collection('alertas_transacciones').add({
+      idTransaccion: dto.idTransaccion,
+      userId: dto.userId,
+      monto: dto.monto,
+      comercio: dto.comercio,
+      fechaHora: dto.fechaHora,
+      ubicacion: dto.ubicacion || null,
+      score,
+      nivelUrgencia,
+      estadoAlerta: 'PENDIENTE',
+      colorIndicador,
+      creadoEn: FieldValue.serverTimestamp(),
+    });
+    // Actualizar el id del documento con su propio ID de Firestore
+    await alertaRef.update({ id: alertaRef.id });
+
+    this.logger.warn(
+      `Alerta creada para ${dto.userId}: score=${score}, nivel=${nivelUrgencia}, monto=${dto.monto}`,
+    );
 
     this.logger.log(`Transacción ${dto.idTransaccion} procesada. Score: ${score}`);
     return { processed: true, score };
@@ -164,7 +162,45 @@ export class BankingService {
       factorDispositivo: input.factorDispositivo ?? 0,
     });
 
+    const db = this.firestoreService.getDb();
+    await db.collection('notificaciones_enviadas').add({
+      userId: input.userId,
+      mensaje: `Simulación Creada: Has simulado una transacción en ${input.comercio} por $${input.monto.toLocaleString('es-CO')}.`,
+      nivelUrgencia: 'INFORMATIVA',
+      fechaHora: FieldValue.serverTimestamp(),
+      leida: false,
+    });
+
     return { ...result, idTransaccion };
+  }
+
+  async updateAlertaEstado(alertaId: string, userId: string, estado: string, motivo?: string) {
+    const db = this.firestoreService.getDb();
+    const alertaRef = db.collection('alertas_transacciones').doc(alertaId);
+    
+    const doc = await alertaRef.get();
+    if (!doc.exists || doc.data()?.userId !== userId) {
+      throw new Error('Alerta no encontrada o acceso denegado');
+    }
+
+    const updates: any = { estadoAlerta: estado.toUpperCase() };
+    if (estado.toUpperCase() === 'REPORTADA') {
+      updates.score = 100;
+      updates.motivoReporte = motivo || 'Sin motivo especificado';
+    }
+
+    await alertaRef.update(updates);
+    
+    // Opcional: Generar notificación de acción
+    await db.collection('notificaciones_enviadas').add({
+      userId,
+      mensaje: `Transacción ${estado === 'confirmada' ? 'Confirmada' : 'Reportada'}: La transacción en ${doc.data()?.comercio} ha sido ${estado}.${motivo ? ` Motivo: ${motivo}` : ''}`,
+      nivelUrgencia: estado === 'confirmada' ? 'INFORMATIVA' : 'ALTA',
+      fechaHora: FieldValue.serverTimestamp(),
+      leida: false,
+    });
+
+    return { success: true };
   }
 
   /**

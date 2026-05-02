@@ -60,6 +60,15 @@ export class BankingController {
     return this.bankingService.simularTransaccion(dto);
   }
 
+  @Post('alerta/:id/accion')
+  @HttpCode(HttpStatus.OK)
+  updateAlertaEstado(
+    @Param('id') alertaId: string,
+    @Body() dto: { userId: string; estado: string; motivo?: string }
+  ) {
+    return this.bankingService.updateAlertaEstado(alertaId, dto.userId, dto.estado, dto.motivo);
+  }
+
   /**
    * GET /banking/alertas/:userId
    * Retorna las alertas de transacciones del usuario desde Firestore.

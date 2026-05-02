@@ -35,6 +35,33 @@ export class KycService {
     });
 
     this.logger.log(`Consentimiento biométrico registrado para UID: ${dto.uid}`);
+
+    // Simular proceso de verificación automática después de 3 segundos
+    setTimeout(async () => {
+      try {
+        await this.procesarWebhookKyc({
+          userId: dto.uid,
+          estado: 'APROBADO',
+        });
+
+        // Actualizar el estado también en el documento del usuario para acceso global
+        await db.collection('usuarios').doc(dto.uid).set({ kycEstado: 'APROBADO' }, { merge: true });
+
+        // Crear notificación de éxito
+        await db.collection('notificaciones_enviadas').add({
+          userId: dto.uid,
+          mensaje: 'Identidad Verificada ✓: Tu proceso KYC ha sido aprobado. Ya tienes acceso completo a Pórtico.',
+          nivelUrgencia: 'INFORMATIVA',
+          fechaHora: FieldValue.serverTimestamp(),
+          leida: false,
+        });
+
+        this.logger.log(`Simulación KYC completada exitosamente para ${dto.uid}`);
+      } catch (err) {
+        this.logger.error(`Error en simulación KYC: ${err}`);
+      }
+    }, 4000);
+
     return { success: true };
   }
 

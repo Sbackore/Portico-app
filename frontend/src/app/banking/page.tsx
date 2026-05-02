@@ -23,19 +23,32 @@ function getBadgeConfig(score: number, estado: string) {
   if (estado === 'confirmada') return { text: 'VERIFICADA', cls: 'bg-primary/20 text-primary-fixed border-primary/30', glow: 'bg-primary/10' };
   if (estado === 'reportada') return { text: 'REPORTADA', cls: 'bg-slate-700/50 text-slate-400 border-slate-600/30', glow: 'bg-slate-700/10' };
   if (score > 80) return { text: 'RIESGO ALTO', cls: 'bg-error/20 text-error border-error/30', glow: 'bg-error/10' };
-  if (score > 60) return { text: 'PENDIENTE', cls: 'bg-orange-500/20 text-orange-400 border-orange-500/30', glow: 'bg-orange-500/10' };
-  return { text: 'VERIFICADA', cls: 'bg-primary/20 text-primary-fixed border-primary/30', glow: 'bg-primary/10' };
+  return { text: 'PENDIENTE', cls: 'bg-orange-500/20 text-orange-400 border-orange-500/30', glow: 'bg-orange-500/10' };
 }
 
-function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: string, accion: string) => Promise<void> }) {
+function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: string, accion: string, motivo?: string) => Promise<void> }) {
   const [loading, setLoading] = useState('');
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [otherReason, setOtherReason] = useState('');
+
+  const reportReasons = [
+    'No reconozco esta transacción',
+    'El monto es incorrecto',
+    'Me robaron el dispositivo o tarjeta',
+    'Sospecha de fraude o estafa',
+    'Otro'
+  ];
+
   const cfg = getBadgeConfig(alerta.score, alerta.estado);
   const amountColor = alerta.score > 80 && alerta.estado === 'pendiente' ? 'text-error' : 'text-white';
 
-  const handleAccion = async (accion: string) => {
+  const handleAccion = async (accion: string, motivo?: string) => {
+    if (!alerta.id) return;
     setLoading(accion);
-    await onAccion(alerta.id, accion);
+    await onAccion(alerta.id, accion, motivo);
     setLoading('');
+    if (accion === 'reportar') setShowReportModal(false);
   };
 
   return (
@@ -89,10 +102,10 @@ function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: strin
           </button>
           <button
             disabled={loading !== ''}
-            onClick={() => handleAccion('reportar')}
+            onClick={() => setShowReportModal(true)}
             className="flex-1 py-3 px-6 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50 disabled:opacity-50"
           >
-            {loading === 'reportar' ? '...' : 'Bloquear / Reportar'}
+            Bloquear / Reportar
           </button>
         </div>
       )}
@@ -101,6 +114,42 @@ function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: strin
           <ShieldCheck size={12} />
           {alerta.estado === 'confirmada' ? 'Transacción confirmada por ti' : 'Reportada · En revisión por el equipo'}
         </p>
+      )}
+
+      {/* Modal de Reporte */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowReportModal(false)}>
+          <div className="bg-[#0F1022] rounded-[28px] w-full max-w-sm border border-white/10 shadow-2xl p-6 flex flex-col" onClick={e => e.stopPropagation()}>
+            <h3 className="font-headline font-bold text-xl text-white mb-2">Reportar Transacción</h3>
+            <p className="text-surface-dim text-sm mb-4 leading-relaxed">Por favor, indícanos el motivo de tu reporte para proceder con el bloqueo.</p>
+            
+            <div className="flex flex-col gap-2 mb-4">
+              {reportReasons.map(r => (
+                <label key={r} className={`flex items-center gap-3 p-3 rounded-[12px] border cursor-pointer transition-colors ${reportReason === r ? 'bg-error/10 border-error/30' : 'bg-[#1A1A24] border-white/5 hover:bg-white/5'}`}>
+                  <input type="radio" name={`reason-${alerta.id}`} value={r} checked={reportReason === r} onChange={() => setReportReason(r)} className="accent-error w-4 h-4" />
+                  <span className={`text-sm font-medium ${reportReason === r ? 'text-error' : 'text-slate-300'}`}>{r}</span>
+                </label>
+              ))}
+            </div>
+            
+            {reportReason === 'Otro' && (
+              <input type="text" placeholder="Escribe el motivo brevemente..." value={otherReason} onChange={e => setOtherReason(e.target.value)}
+                className="w-full bg-[#1A1A24] border border-white/10 text-white rounded-[14px] py-3 px-4 font-body text-sm outline-none focus:ring-1 focus:ring-error focus:border-error mb-4" autoFocus />
+            )}
+            
+            <div className="flex gap-3 mt-4">
+              <button onClick={() => setShowReportModal(false)} className="flex-1 py-3 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50">Cancelar</button>
+              <button disabled={loading === 'reportar' || !reportReason || (reportReason === 'Otro' && !otherReason)}
+                onClick={() => {
+                  const finalReason = reportReason === 'Otro' ? otherReason : reportReason;
+                  handleAccion('reportar', finalReason);
+                }}
+                className="flex-1 py-3 rounded-full bg-error text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(239,68,68,0.2)] disabled:opacity-50">
+                Reportar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </article>
   );
@@ -141,67 +190,75 @@ function CrearAlertaModal({ userId, onClose, onCreated }: { userId: string; onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-[#0F1022] rounded-t-[28px] p-6 w-full max-w-lg border border-white/10 shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-headline font-bold text-xl text-white">Simular transacción</h3>
-          <button onClick={onClose} className="p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 transition-colors">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4" onClick={onClose}>
+      <div className="bg-[#0F1022] rounded-t-[28px] sm:rounded-[28px] w-full max-w-lg border border-white/10 shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+        
+        {/* Header Sticky */}
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-white/5 shrink-0">
+          <div>
+            <h3 className="font-headline font-bold text-xl text-white">Simular transacción</h3>
+            <p className="text-surface-dim text-xs mt-1">Crea una transacción de prueba de fraude.</p>
+          </div>
+          <button type="button" onClick={onClose} className="p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 transition-colors">
             <X size={20} className="text-slate-400" />
           </button>
         </div>
 
-        <p className="text-surface-dim text-sm mb-6 leading-relaxed">
-          Crea una transacción de prueba para ver cómo funciona el sistema de detección de fraude en tiempo real.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Comercio</label>
-            <div className="relative">
-              <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <select value={form.comercio} onChange={set('comercio')}
-                className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container appearance-none">
-                <option value="" disabled>Selecciona un comercio</option>
-                {COMERCIOS.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+        {/* Contenido Scrollable */}
+        <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+          <form id="simular-form" onSubmit={handleSubmit} className="space-y-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Comercio</label>
+              <div className="relative">
+                <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <select value={form.comercio} onChange={set('comercio')}
+                  className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container appearance-none">
+                  <option value="" disabled>Selecciona un comercio</option>
+                  {COMERCIOS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Monto (COP)</label>
-            <div className="relative">
-              <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input type="number" placeholder="ej. 250000" value={form.monto} onChange={set('monto')}
-                className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Monto (COP)</label>
+              <div className="relative">
+                <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="number" placeholder="ej. 250000" value={form.monto} onChange={set('monto')}
+                  className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container" />
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Ubicación (opcional)</label>
-            <div className="relative">
-              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input type="text" placeholder="ej. Bogotá, CO" value={form.ubicacion} onChange={set('ubicacion')}
-                className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container" />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Ubicación (opcional)</label>
+              <div className="relative">
+                <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="text" placeholder="ej. Bogotá, CO" value={form.ubicacion} onChange={set('ubicacion')}
+                  className="w-full bg-[#1A1A24] border-none text-white rounded-[14px] py-4 pl-10 pr-4 font-body text-base outline-none focus:ring-1 focus:ring-primary-container" />
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Factor de dispositivo</label>
-            <div className="flex gap-3">
-              {[{ v: '0', l: '🟢 Confiable' }, { v: '50', l: '🟠 Nuevo' }, { v: '100', l: '🔴 Desconocido' }].map(opt => (
-                <button key={opt.v} type="button" onClick={() => setForm(p => ({ ...p, factorDispositivo: opt.v }))}
-                  className={`flex-1 py-3 rounded-[12px] text-xs font-semibold transition-colors border ${form.factorDispositivo === opt.v ? 'bg-primary/20 border-primary/30 text-primary-fixed' : 'bg-[#1A1A24] border-white/5 text-slate-400 hover:bg-white/5'}`}>
-                  {opt.l}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-label font-semibold text-slate-400 uppercase tracking-wide">Factor de dispositivo</label>
+              <div className="flex gap-3">
+                {[{ v: '0', l: '🟢 Confiable' }, { v: '50', l: '🟠 Nuevo' }, { v: '100', l: '🔴 Desconocido' }].map(opt => (
+                  <button key={opt.v} type="button" onClick={() => setForm(p => ({ ...p, factorDispositivo: opt.v }))}
+                    className={`flex-1 py-3 rounded-[12px] text-xs font-semibold transition-colors border ${form.factorDispositivo === opt.v ? 'bg-primary/20 border-primary/30 text-primary-fixed' : 'bg-[#1A1A24] border-white/5 text-slate-400 hover:bg-white/5'}`}>
+                    {opt.l}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          </form>
+        </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full py-4 rounded-full bg-primary text-white font-bold text-base tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.3)] disabled:opacity-50 mt-2">
+        {/* Footer Sticky con el botón */}
+        <div className="p-6 pt-4 border-t border-white/5 shrink-0 bg-[#0F1022] rounded-b-[28px]">
+          <button form="simular-form" type="submit" disabled={loading}
+            className="w-full py-4 rounded-full bg-primary text-white font-bold text-base tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.3)] disabled:opacity-50">
             {loading ? 'Procesando...' : 'Simular transacción'}
           </button>
-        </form>
+        </div>
+
       </div>
     </div>
   );
@@ -232,16 +289,24 @@ export default function BankingPage() {
     if (user) cargarAlertas();
   }, [user, loading, router, cargarAlertas]);
 
-  const handleAccion = async (alertaId: string, accion: string) => {
+  const handleAccion = async (alertaId: string, accion: string, motivo?: string) => {
+    if (!user) return;
     try {
+      const nuevoEstado = accion === 'confirmar' ? 'confirmada' : 'reportada';
+      await api.post(`/banking/alerta/${alertaId}/accion`, {
+        userId: user.uid,
+        estado: nuevoEstado,
+        motivo,
+      });
+
       setAlertas(prev =>
         prev.map(a =>
           a.id === alertaId
-            ? { ...a, estado: accion === 'confirmar' ? 'confirmada' : 'reportada' }
+            ? { ...a, estado: nuevoEstado, score: accion === 'reportar' ? 100 : a.score }
             : a,
         ),
       );
-      toast.success(accion === 'confirmar' ? '✅ Transacción confirmada' : '🚨 Reporte enviado. Nuestro equipo te contactará.');
+      toast.success(accion === 'confirmar' ? '✅ Transacción confirmada' : '🚨 Reporte enviado. Nuestro equipo lo revisará.');
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -282,9 +347,9 @@ export default function BankingPage() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="shrink-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-[0px_4px_12px_rgba(108,71,255,0.4)] hover:brightness-110 active:scale-95 transition-all"
+            className="shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-white font-bold text-sm shadow-[0px_4px_12px_rgba(108,71,255,0.4)] hover:brightness-110 active:scale-95 transition-all"
           >
-            <Plus size={20} className="text-white" />
+            <Plus size={18} /> Simular transacción
           </button>
         </div>
 

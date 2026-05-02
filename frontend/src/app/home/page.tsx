@@ -18,12 +18,7 @@ interface DashboardData {
   notificacionesNoleidas?: number;
 }
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Buenos días';
-  if (h < 18) return 'Buenas tardes';
-  return 'Buenas noches';
-}
+
 
 function AlertCard({ alerta }: { alerta: NonNullable<DashboardData['alertasRecientes']>[0] }) {
   const isHigh = alerta.score > 60;
@@ -100,6 +95,13 @@ export default function HomePage() {
   const router = useRouter();
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [time, setTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setTime(new Date());
+    const timer = setInterval(() => setTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchDashboard = useCallback(async () => {
     if (!user) return;
@@ -130,6 +132,14 @@ export default function HomePage() {
   const firstName = dashboard?.nombre?.split(' ')[0] || 'Usuario';
   const score = dashboard?.scoreSeguridadCuenta || 100;
   const scoreColor = score >= 70 ? '#00FF85' : score >= 40 ? '#fb923c' : '#f87171';
+
+  const getGreeting = (d: Date | null) => {
+    if (!d) return 'Hola';
+    const h = d.getHours();
+    if (h >= 5 && h < 12) return 'Buenos días';
+    if (h >= 12 && h < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  };
 
   return (
     <div style={{ minHeight: '100dvh', background: '#0A0B1E', color: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: '96px' }}
@@ -167,8 +177,13 @@ export default function HomePage() {
 
         {/* Greeting */}
         <section style={{ marginBottom: '32px', paddingLeft: '8px' }}>
+          {time && (
+            <p style={{ color: '#6c47ff', fontSize: '13px', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              {time.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
           <h2 style={{ fontSize: '36px', fontWeight: 700, letterSpacing: '-0.025em', color: '#fff', marginBottom: '8px', lineHeight: '1.15' }}>
-            {getGreeting()}, {firstName} 👋
+            {getGreeting(time)}, {firstName} 👋
           </h2>
           <p style={{ color: '#797588', fontSize: '16px' }}>
             Revisa la actividad reciente de tus cuentas.

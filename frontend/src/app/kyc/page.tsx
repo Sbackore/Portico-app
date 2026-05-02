@@ -114,15 +114,18 @@ export default function KycPage() {
 
         {/* Consent */}
         {(estado === 'PENDIENTE' || estado === 'RECHAZADO') && !bloqueado && (
-          <Card>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" checked={consentido} onChange={e => setConsentido(e.target.checked)}
-                className="mt-1 w-4 h-4 accent-[#7B5EA7]" />
-              <p className="text-xs text-gray-400 leading-relaxed">
+          <div className="bg-[#1A1A24] border border-white/5 rounded-[16px] p-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setConsentido(!consentido)}>
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 shrink-0">
+                <div className={`w-5 h-5 rounded-[6px] border flex items-center justify-center transition-colors ${consentido ? 'bg-primary border-primary' : 'bg-[#0F1022] border-slate-600'}`}>
+                  {consentido && <CheckCircle size={14} className="text-white" />}
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed select-none">
                 Autorizo a Pórtico a procesar mis datos biométricos para verificación de identidad conforme a la Ley 1581 de 2012 (HABEAS DATA). Mis datos serán usados exclusivamente para este propósito y eliminados tras la verificación.
               </p>
-            </label>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Acción */}
@@ -145,9 +148,19 @@ export default function KycPage() {
             <p className="text-gray-400 text-xs mt-1">Esto puede tardar unos minutos.</p>
           </Card>
         ) : (
-          <Button fullWidth size="lg" loading={loadingSubmit} onClick={handleIniciar}>
-            <Camera size={18} /> Comenzar verificación
-          </Button>
+          <button 
+            onClick={handleIniciar}
+            disabled={!consentido || loadingSubmit}
+            className={`w-full py-4 rounded-full flex items-center justify-center gap-2 font-bold text-base tracking-wide transition-all shadow-[0px_8px_16px_rgba(108,71,255,0.3)]
+              ${consentido && !loadingSubmit ? 'bg-primary text-white active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-70'}
+            `}
+          >
+            {loadingSubmit ? (
+              <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <><Camera size={18} /> Comenzar verificación</>
+            )}
+          </button>
         )}
       </div>
 

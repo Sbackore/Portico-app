@@ -249,7 +249,7 @@ export default function PerfilPage() {
               </h3>
               <div className="flex flex-col gap-1">
                 {[
-                  { icon: <Lock size={16} />, label: 'Cambiar contraseña', href: '/recuperar' },
+                  { icon: <Lock size={16} />, label: 'Cambiar contraseña', href: '/perfil/cambiar-contrasena' },
                   { icon: <Fingerprint size={16} />, label: 'Verificación biométrica (KYC)', href: '/kyc' },
                   { icon: <Shield size={16} />, label: 'Estado de seguridad de cuenta', href: '/rasp' },
                 ].map(item => (
@@ -273,17 +273,19 @@ export default function PerfilPage() {
               </h3>
               <div className="flex flex-col gap-1">
                 {[
-                  { icon: <FileText size={16} />, label: 'Términos y condiciones' },
-                  { icon: <FileText size={16} />, label: 'Política de privacidad' },
-                  { icon: <HelpCircle size={16} />, label: 'Ayuda y soporte' },
+                  { icon: <FileText size={16} />, label: 'Términos y condiciones', href: '/perfil/terminos' },
+                  { icon: <FileText size={16} />, label: 'Política de privacidad', href: '/perfil/privacidad' },
+                  { icon: <HelpCircle size={16} />, label: 'Ayuda y soporte', href: '/perfil/soporte' },
                 ].map(item => (
-                  <div key={item.label} className="flex items-center justify-between py-3 hover:bg-white/5 rounded-[12px] px-2 transition-colors -mx-2 cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <span className="text-primary-fixed-dim">{item.icon}</span>
-                      <span className="text-sm text-white font-medium">{item.label}</span>
+                  <Link key={item.label} href={item.href}>
+                    <div className="flex items-center justify-between py-3 hover:bg-white/5 rounded-[12px] px-2 transition-colors -mx-2 cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <span className="text-primary-fixed-dim">{item.icon}</span>
+                        <span className="text-sm text-white font-medium">{item.label}</span>
+                      </div>
+                      <ChevronRight size={16} className="text-surface-dim" />
                     </div>
-                    <ChevronRight size={16} className="text-surface-dim" />
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>
