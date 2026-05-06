@@ -18,16 +18,26 @@ export class FirestoreService implements OnModuleInit {
     );
 
     if (!admin.apps.length) {
-      // En Cloud Run usamos Application Default Credentials automáticas.
-      // Si hay serviceAccountKey.json local, lo usamos para desarrollo.
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const serviceAccount = require('./serviceAccountKey.json');
-        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-        this.logger.log('Firebase Admin inicializado con serviceAccountKey.json');
-      } catch {
-        admin.initializeApp({ projectId });
-        this.logger.log('Firebase Admin inicializado con Application Default Credentials');
+      // Intentar primero desde variable de entorno (Para Render / Producción)
+      if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        try {
+          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+          this.logger.log('Firebase Admin inicializado con variable de entorno FIREBASE_SERVICE_ACCOUNT');
+        } catch (e) {
+          this.logger.error('Error parseando FIREBASE_SERVICE_ACCOUNT. ¿Es un JSON válido?', e);
+        }
+      } else {
+        // Fallback local
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const serviceAccount = require('./serviceAccountKey.json');
+          admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+          this.logger.log('Firebase Admin inicializado con serviceAccountKey.json (Modo Local)');
+        } catch {
+          admin.initializeApp({ projectId });
+          this.logger.log('Firebase Admin inicializado con Application Default Credentials');
+        }
       }
     }
 
