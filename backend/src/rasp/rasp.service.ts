@@ -85,10 +85,17 @@ export class RaspService {
     scoreSeguridadCuenta: number;
     amenazasRecientes: object[];
     bloqueoTemporalHasta?: string;
+    sesionesRecientes: object[];
+    kycPendiente: boolean;
+    resumenTransaccional?: {
+      promedioRiesgo: number;
+      ubicacionFrecuente: string;
+      totalAnalizadas: number;
+    };
   }> {
     const db = this.firestoreService.getDb();
 
-    const [userDoc, segDoc, autDoc, amenazasSnap] = await Promise.all([
+    const [userDoc, segDoc, autDoc, amenazasSnap, notifSnap, transSnap] = await Promise.all([
       db.collection('usuarios').doc(userId).get(),
       db.collection('seguridad_dispositivo').doc(userId).get(),
       db.collection('autenticacion').doc(userId).get(),
@@ -96,13 +103,27 @@ export class RaspService {
         .where('userId', '==', userId)
         .limit(10)
         .get(),
+      db.collection('notificaciones_enviadas')
+        .where('userId', '==', userId)
+        .get(),
+      db.collection('alertas_transacciones')
+        .where('userId', '==', userId)
+        .get(),
     ]);
 
-    // Score: primero seguridad_dispositivo, luego usuarios, default 100
-    const scoreSeguridadCuenta =
+    const userData = userDoc.data() || {};
+    const kycEstado = userData.kycEstado || 'PENDIENTE';
+    const kycPendiente = kycEstado !== 'APROBADO';
+
+    // Score base: primero seguridad_dispositivo, luego usuarios, default 100
+    let scoreSeguridadCuenta =
       segDoc.data()?.nivelSeguridadCuenta ??
-      userDoc.data()?.scoreSeguridadCuenta ??
+      userData.scoreSeguridadCuenta ??
       100;
+
+    if (kycPendiente) {
+      scoreSeguridadCuenta -= 30; // Penalización por KYC
+    }
 
     // Bloqueo activo
     let bloqueoTemporalHasta: string | undefined;
@@ -137,13 +158,64 @@ export class RaspService {
       };
     });
 
-    // Ordenar por fecha descendente
     amenazasRecientes.sort((a, b) => b.timestampMs - a.timestampMs);
+
+    // Filtrar sesiones recientes de las notificaciones
+    const allNotifs = notifSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const sesionesRecientes = allNotifs
+      .filter((n: any) => n.mensaje && /sesi[oó]n/i.test(n.mensaje))
+      .map((n: any) => {
+        let ts = Date.now();
+        if (n.fechaHora && typeof n.fechaHora.toDate === 'function') ts = n.fechaHora.toDate().getTime();
+        return {
+          id: n.id,
+          tipo: n.mensaje.includes('Nuevo') ? 'INICIO' : 'CIERRE',
+          dispositivo: 'Navegador Web',
+          timestampMs: ts,
+        };
+      })
+      .sort((a, b) => b.timestampMs - a.timestampMs)
+      .slice(0, 3);
+
+    // Resumen Riesgo Transaccional
+    const allTrans = transSnap.docs.map(d => d.data());
+    const ultimasTrans = allTrans
+      .map((t: any) => {
+        let ts = Date.now();
+        if (t.creadoEn && typeof t.creadoEn.toDate === 'function') ts = t.creadoEn.toDate().getTime();
+        return { ...t, ts };
+      })
+      .sort((a, b) => b.ts - a.ts)
+      .slice(0, 10);
+      
+    let promedioRiesgo = 0;
+    if (ultimasTrans.length > 0) {
+      promedioRiesgo = Math.round(ultimasTrans.reduce((acc, curr) => acc + (curr.score || 0), 0) / ultimasTrans.length);
+    }
+
+    const resumenTransaccional = {
+      promedioRiesgo,
+      ubicacionFrecuente: ultimasTrans.length > 0 ? (ultimasTrans[0].ubicacion || 'Bogotá, CO') : 'Desconocida',
+      totalAnalizadas: ultimasTrans.length,
+      historialScores: ultimasTrans.map((t: any) => t.score || 0).reverse()
+    };
+
+    // Penalización dinámica por alto riesgo transaccional
+    if (promedioRiesgo > 20) {
+      // Restamos la mitad de los puntos que excedan el "riesgo normal" de 20.
+      // Por ejemplo, si el promedio es 46, excedemos por 26. 26 / 2 = 13 puntos de penalización.
+      scoreSeguridadCuenta -= Math.floor((promedioRiesgo - 20) / 2);
+    }
+
+    this.logger.log(`[RaspService] User: ${userId} -> Sesiones: ${sesionesRecientes.length}, Transacciones: ${ultimasTrans.length}, Score Final: ${Math.max(0, Math.min(100, scoreSeguridadCuenta))}`);
 
     return {
       scoreSeguridadCuenta: Math.max(0, Math.min(100, scoreSeguridadCuenta)),
       amenazasRecientes,
       bloqueoTemporalHasta,
+      sesionesRecientes,
+      kycPendiente,
+      resumenTransaccional,
     };
   }
 }

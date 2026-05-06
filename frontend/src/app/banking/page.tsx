@@ -4,9 +4,12 @@ import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
 import { PageLoader } from '@/components/ui';
-import { Menu, UserCircle, ShieldCheck, Plus, X, Building2, DollarSign, MapPin } from 'lucide-react';
+import { Menu, UserCircle, ShieldCheck, Plus, X, Building2, DollarSign, MapPin, ChevronDown } from 'lucide-react';
 import api, { getErrorMessage } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { Skeleton } from '@/components/ui';
+import { motion, AnimatePresence } from 'framer-motion';
+import { isToday, isYesterday } from 'date-fns';
 
 interface Alerta {
   id: string;
@@ -31,6 +34,7 @@ function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: strin
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [otherReason, setOtherReason] = useState('');
+  const [expanded, setExpanded] = useState(alerta.estado === 'pendiente');
 
   const reportReasons = [
     'No reconozco esta transacción',
@@ -52,10 +56,13 @@ function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: strin
   };
 
   return (
-    <article className="bg-[#0F1022] rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-transform duration-200 active:scale-[0.98]">
+    <article 
+      onClick={() => !showReportModal && setExpanded(!expanded)}
+      className="bg-[#0F1022] rounded-[20px] p-6 shadow-[0px_12px_32px_rgba(108,71,255,0.08)] relative overflow-hidden transition-colors duration-200 cursor-pointer hover:bg-[#13152B]"
+    >
       <div className={`absolute top-0 right-0 w-32 h-32 ${cfg.glow} blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none`}></div>
       
-      <div className="flex justify-between items-start mb-6 relative z-10">
+      <div className="flex justify-between items-start mb-2 relative z-10">
         <div>
           <h2 className="font-headline font-semibold text-lg text-white">{alerta.comercio}</h2>
           <p className="text-sm text-slate-400 font-medium">
@@ -63,52 +70,72 @@ function AlertaCard({ alerta, onAccion }: { alerta: Alerta; onAccion: (id: strin
           </p>
           {alerta.ubicacion && <p className="text-xs text-slate-500 mt-1">📍 {alerta.ubicacion}</p>}
         </div>
-        <div className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 border ${cfg.cls}`}>
-          <span className="text-xs font-label font-semibold tracking-wide uppercase">{cfg.text}</span>
+        <div className="flex items-center gap-2">
+          <div className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 border ${cfg.cls}`}>
+            <span className="text-xs font-label font-semibold tracking-wide uppercase">{cfg.text}</span>
+          </div>
+          <motion.div animate={{ rotate: expanded ? 180 : 0 }} className="text-slate-500">
+            <ChevronDown size={20} />
+          </motion.div>
         </div>
       </div>
 
-      <div className="mb-5 relative z-10">
+      <div className="mb-2 relative z-10">
         <p className={`text-[1.75rem] font-display font-bold ${amountColor} tracking-tight`}>
           -${alerta.monto.toLocaleString('es-CO')}
         </p>
       </div>
 
-      <div className="bg-[#1A1A24] rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-slate-300 relative z-10 border border-slate-700/50 mb-6">
-        <div className="flex flex-col">
-          <span className="font-label font-semibold text-slate-500 mb-0.5">ID Alerta</span>
-          <span className="font-mono font-medium">{alerta.id.substring(0, 8).toUpperCase()}</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-label font-semibold text-slate-500 mb-0.5">ID Transacción</span>
-          <span className="font-mono font-medium">{alerta.idTransaccion.substring(0, 12).toUpperCase()}</span>
-        </div>
-        {alerta.score > 0 && (
-          <div className="flex flex-col">
-            <span className="font-label font-semibold text-slate-500 mb-0.5">Score Riesgo</span>
-            <span className={`font-mono font-medium ${alerta.score > 80 ? 'text-error' : alerta.score > 60 ? 'text-orange-400' : 'text-[#00FF85]'}`}>{alerta.score}/100</span>
-          </div>
-        )}
-      </div>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }} 
+            animate={{ height: 'auto', opacity: 1 }} 
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="pt-4">
+              <div className="bg-[#1A1A24] rounded-[12px] p-3.5 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] text-slate-300 relative z-10 border border-slate-700/50 mb-6">
+                <div className="flex flex-col">
+                  <span className="font-label font-semibold text-slate-500 mb-0.5">ID Alerta</span>
+                  <span className="font-mono font-medium">{alerta.id.substring(0, 8).toUpperCase()}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-label font-semibold text-slate-500 mb-0.5">ID Transacción</span>
+                  <span className="font-mono font-medium">{alerta.idTransaccion.substring(0, 12).toUpperCase()}</span>
+                </div>
+                {alerta.score > 0 && (
+                  <div className="flex flex-col">
+                    <span className="font-label font-semibold text-slate-500 mb-0.5">Score Riesgo</span>
+                    <span className={`font-mono font-medium ${alerta.score > 80 ? 'text-error' : alerta.score > 60 ? 'text-orange-400' : 'text-[#00FF85]'}`}>{alerta.score}/100</span>
+                  </div>
+                )}
+              </div>
 
-      {alerta.estado === 'pendiente' && (
-        <div className="flex gap-4 relative z-10">
-          <button
-            disabled={loading !== ''}
-            onClick={() => handleAccion('confirmar')}
-            className="flex-1 py-3 px-6 rounded-full bg-primary text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.2)] disabled:opacity-50"
-          >
-            {loading === 'confirmar' ? '...' : 'Verificar'}
-          </button>
-          <button
-            disabled={loading !== ''}
-            onClick={() => setShowReportModal(true)}
-            className="flex-1 py-3 px-6 rounded-full border border-slate-700 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-800/50 disabled:opacity-50"
-          >
-            Bloquear / Reportar
-          </button>
-        </div>
-      )}
+              {alerta.estado === 'pendiente' && (
+                <div className="flex gap-4 relative z-10">
+                  <button
+                    disabled={loading !== ''}
+                    onClick={() => handleAccion('confirmar')}
+                    className="flex-1 py-3 px-6 rounded-full bg-primary text-white font-bold text-sm tracking-wide active:scale-95 transition-transform shadow-[0px_8px_16px_rgba(108,71,255,0.2)] disabled:opacity-50"
+                  >
+                    {loading === 'confirmar' ? 'Procesando...' : 'Fui yo'}
+                  </button>
+                  <button
+                    disabled={loading !== ''}
+                    onClick={() => setShowReportModal(true)}
+                    className="flex-1 py-3 px-6 rounded-full bg-slate-800 text-white font-bold text-sm tracking-wide active:scale-95 transition-transform hover:bg-slate-700 disabled:opacity-50"
+                  >
+                    No reconozco
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {alerta.estado !== 'pendiente' && (
         <p className="text-xs text-slate-500 relative z-10 flex items-center gap-1">
           <ShieldCheck size={12} />
@@ -318,15 +345,32 @@ export default function BankingPage() {
     return true;
   });
 
-  if (loading || loadingData) return <PageLoader />;
+  const agrupadas = alertasFiltradas.reduce((acc, a) => {
+    const d = new Date(a.fechaHora);
+    const cat = isToday(d) ? 'Hoy' : isYesterday(d) ? 'Ayer' : 'Anteriores';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(a);
+    return acc;
+  }, {} as Record<string, Alerta[]>);
+
+  if (loading || loadingData) {
+    return (
+      <div className="font-body min-h-screen pb-32 bg-transparent p-6">
+        <div className="max-w-2xl mx-auto pt-24 space-y-4">
+          <Skeleton className="w-full h-12 rounded-full mb-6" />
+          <Skeleton className="w-full h-32 rounded-[20px]" />
+          <Skeleton className="w-full h-32 rounded-[20px]" />
+          <Skeleton className="w-full h-32 rounded-[20px]" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="font-body antialiased min-h-screen pb-32 bg-[#0A0A0F] text-white animate-fade-in">
+    <div className="font-body antialiased min-h-screen pb-32 bg-transparent text-white animate-fade-in">
       {/* TopAppBar */}
       <header className="fixed top-0 z-40 bg-[#0A0A0F]/80 backdrop-blur-lg flex justify-between items-center w-full px-6 py-4 shadow-none border-b border-white/5">
-        <button className="text-primary-container hover:bg-slate-800/50 active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
-          <Menu size={24} />
-        </button>
+        <div className="w-10 h-10" />
         <h1 className="font-headline tracking-tight font-semibold text-lg text-white">Transacciones</h1>
         <button className="hover:bg-slate-800/50 active:scale-95 duration-200 rounded-full overflow-hidden w-9 h-9 border-2 border-slate-800 flex items-center justify-center bg-slate-800">
           <UserCircle size={24} className="text-surface-dim" />
@@ -374,9 +418,19 @@ export default function BankingPage() {
               )}
             </div>
           ) : (
-            alertasFiltradas.map(a => (
-              <AlertaCard key={a.id} alerta={a} onAccion={handleAccion} />
-            ))
+            ['Hoy', 'Ayer', 'Anteriores'].map(cat => {
+              if (!agrupadas[cat]) return null;
+              return (
+                <div key={cat} className="mb-6">
+                  <h3 className="text-surface-dim text-sm font-semibold mb-4 tracking-wide pl-2">{cat}</h3>
+                  <div className="flex flex-col gap-4">
+                    {agrupadas[cat].map(a => (
+                      <AlertaCard key={a.id} alerta={a} onAccion={handleAccion} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       </main>

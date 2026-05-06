@@ -22,7 +22,8 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message: string; error: string }>) => {
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
+      const isAuthRoute = error.config && error.config.url && error.config.url.includes('/auth/');
+      if (!isAuthRoute && typeof window !== 'undefined') {
         localStorage.removeItem('portico_token');
         localStorage.removeItem('portico_user');
         window.location.href = '/login';

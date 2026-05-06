@@ -1,12 +1,13 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
-import { Card, Badge, Button, PageLoader } from '@/components/ui';
-import { UserCheck, Camera, Clock, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
+import { Card, Badge, PageLoader } from '@/components/ui';
+import { Camera, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import api, { getErrorMessage } from '@/lib/api';
 import toast from 'react-hot-toast';
+import Webcam from 'react-webcam';
 
 type KycEstado = 'PENDIENTE' | 'EN_PROCESO' | 'APROBADO' | 'RECHAZADO' | 'REVISION';
 
@@ -27,6 +28,10 @@ export default function KycPage() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [consentido, setConsentido] = useState(false);
 
+  const [showCamera, setShowCamera] = useState(false);
+  const [fotoRostro, setFotoRostro] = useState<string | null>(null);
+  const webcamRef = useRef<Webcam>(null);
+
   const cargarEstado = useCallback(async () => {
     if (!user) return;
     try {
@@ -42,10 +47,19 @@ export default function KycPage() {
     if (user) { setEstado((user.kycEstado as KycEstado) || 'PENDIENTE'); setLoadingData(false); cargarEstado(); }
   }, [user, loading, router, cargarEstado]);
 
-  const handleIniciar = async () => {
-    if (!user) return;
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current?.getScreenshot();
+    if (imageSrc) setFotoRostro(imageSrc);
+  }, [webcamRef]);
+
+  const handleIniciarCamera = () => {
     if (!consentido) { toast.error('Debes aceptar los términos para continuar'); return; }
     if (intentos >= 3) { toast.error('Has alcanzado el máximo de intentos. Contacta soporte.'); return; }
+    setShowCamera(true);
+  };
+
+  const handleSubirBiometria = async () => {
+    if (!user || !fotoRostro) return;
     setLoadingSubmit(true);
     try {
       await api.post('/kyc/consentimiento', {
@@ -55,7 +69,8 @@ export default function KycPage() {
       });
       setEstado('EN_PROCESO');
       setIntentos(i => i + 1);
-      toast.success('¡Proceso iniciado! Recibirás una notificación con el resultado.');
+      toast.success('¡Proceso iniciado! Analizando biometría...');
+      setShowCamera(false);
       await refreshUser();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -65,6 +80,52 @@ export default function KycPage() {
   };
 
   if (loading || loadingData) return <PageLoader />;
+  
+  if (showCamera) {
+    return (
+      <div className="fixed inset-0 bg-[#0F1022] z-50 flex flex-col animate-fade-in">
+        <div className="flex-1 relative bg-black flex flex-col items-center justify-center overflow-hidden">
+          {!fotoRostro ? (
+            <>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{ facingMode: "user" }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 border-[40px] border-[#0F1022]/80 pointer-events-none rounded-[120px] shadow-[inset_0_0_0_2px_#6C47FF]"></div>
+              <div className="absolute top-12 left-0 right-0 text-center z-10 px-6">
+                <h2 className="text-white font-bold text-xl mb-2">Ubica tu rostro en el óvalo</h2>
+                <p className="text-white/80 text-sm">Asegúrate de tener buena iluminación</p>
+              </div>
+              <div className="absolute bottom-12 left-0 right-0 flex justify-center z-10 gap-4 px-6">
+                <button onClick={() => setShowCamera(false)} className="px-6 py-4 rounded-full bg-white/10 backdrop-blur text-white font-bold text-sm">Cancelar</button>
+                <button onClick={capture} className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-white active:scale-95 transition-transform" />
+                </button>
+                <div className="w-[100px]" />
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center w-full h-full justify-center p-6 bg-[#0F1022]">
+              <h2 className="text-white font-bold text-2xl mb-6">Confirma tu foto</h2>
+              <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-[#6C47FF] mb-8">
+                <img src={fotoRostro} alt="Selfie" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex gap-4 w-full max-w-sm">
+                <button onClick={() => setFotoRostro(null)} disabled={loadingSubmit} className="flex-1 py-4 rounded-full border border-white/20 text-white font-bold">Tomar otra</button>
+                <button onClick={handleSubirBiometria} disabled={loadingSubmit} className="flex-1 py-4 rounded-full bg-primary text-white font-bold flex items-center justify-center">
+                  {loadingSubmit ? <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" /> : 'Confirmar'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const cfg = estadoConfig[estado];
   const Icon = cfg.icon;
   const bloqueado = intentos >= 3 && estado !== 'APROBADO';
@@ -97,8 +158,7 @@ export default function KycPage() {
             <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Proceso de verificación</p>
             {[
               { label: 'Acepta los términos', desc: 'Consentimiento de verificación de identidad' },
-              { label: 'Captura tu documento', desc: 'Foto del documento de identidad por ambos lados' },
-              { label: 'Selfie con documento', desc: 'Foto tuya sosteniendo tu documento' },
+              { label: 'Selfie en vivo', desc: 'Prueba de vida con tu cámara' },
               { label: 'Verificación biométrica', desc: 'Análisis automático por IA' },
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3 mb-3 last:mb-0">
@@ -149,17 +209,13 @@ export default function KycPage() {
           </Card>
         ) : (
           <button 
-            onClick={handleIniciar}
-            disabled={!consentido || loadingSubmit}
+            onClick={handleIniciarCamera}
+            disabled={!consentido}
             className={`w-full py-4 rounded-full flex items-center justify-center gap-2 font-bold text-base tracking-wide transition-all shadow-[0px_8px_16px_rgba(108,71,255,0.3)]
-              ${consentido && !loadingSubmit ? 'bg-primary text-white active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-70'}
+              ${consentido ? 'bg-primary text-white active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-70'}
             `}
           >
-            {loadingSubmit ? (
-              <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-            ) : (
-              <><Camera size={18} /> Comenzar verificación</>
-            )}
+            <Camera size={18} /> Comenzar verificación
           </button>
         )}
       </div>

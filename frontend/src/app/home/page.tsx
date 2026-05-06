@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
-import { PageLoader } from '@/components/ui';
+import { PageLoader, Skeleton } from '@/components/ui';
 import Link from 'next/link';
 import api from '@/lib/api';
 
@@ -106,12 +106,13 @@ export default function HomePage() {
   const fetchDashboard = useCallback(async () => {
     if (!user) return;
     try {
-      const [alertasRes] = await Promise.allSettled([
+      const [alertasRes, raspRes] = await Promise.allSettled([
         api.get(`/banking/alertas/${user.uid}`),
+        api.get(`/rasp/estado/${user.uid}`),
       ]);
       setDashboard({
         nombre: user.nombre,
-        scoreSeguridadCuenta: user.scoreSeguridadCuenta || 100,
+        scoreSeguridadCuenta: raspRes.status === 'fulfilled' ? raspRes.value.data?.scoreSeguridadCuenta : (user.scoreSeguridadCuenta || 100),
         kycEstado: user.kycEstado,
         alertasRecientes: alertasRes.status === 'fulfilled' ? alertasRes.value.data?.slice(0, 3) : [],
       });
@@ -127,7 +128,21 @@ export default function HomePage() {
     if (user) fetchDashboard();
   }, [user, loading, router, fetchDashboard]);
 
-  if (loading || loadingData) return <PageLoader />;
+  if (loading || loadingData) {
+    return (
+      <div style={{ minHeight: '100dvh', background: '#0A0B1E', paddingTop: '88px', padding: '88px 20px 0', maxWidth: '672px', margin: '0 auto' }}>
+        <Skeleton className="w-1/2 h-8 mb-2" />
+        <Skeleton className="w-3/4 h-4 mb-8" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+          <Skeleton className="w-full h-32" />
+          <Skeleton className="w-full h-32" />
+        </div>
+        <Skeleton className="w-1/3 h-6 mb-4" />
+        <Skeleton className="w-full h-40 mb-4" />
+        <Skeleton className="w-full h-40" />
+      </div>
+    );
+  }
 
   const firstName = dashboard?.nombre?.split(' ')[0] || 'Usuario';
   const score = dashboard?.scoreSeguridadCuenta || 100;
@@ -142,8 +157,8 @@ export default function HomePage() {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', background: '#0A0B1E', color: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: '96px' }}
-      className="animate-fade-in">
+    <div style={{ minHeight: '100dvh', color: '#fff', fontFamily: 'Inter, sans-serif', paddingBottom: '96px' }}
+      className="animate-fade-in bg-transparent relative z-10">
 
       {/* TopAppBar */}
       <header style={{
@@ -153,11 +168,7 @@ export default function HomePage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '16px 24px',
       }}>
-        <button style={{ background: 'transparent', border: 'none', color: '#6c47ff', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
+        <div style={{ width: '40px', height: '40px' }} />
         <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>Principal</h1>
         <Link href="/perfil">
           <div style={{

@@ -179,6 +179,15 @@ export function PageLoader() {
 }
 
 /* ================================================================
+   SKELETON
+   ================================================================ */
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn('animate-pulse bg-white/[0.04] rounded-[16px]', className)} />
+  );
+}
+
+/* ================================================================
    SECTION TITLE
    ================================================================ */
 export function SectionTitle({ children, accent }: { children: React.ReactNode; accent?: boolean }) {

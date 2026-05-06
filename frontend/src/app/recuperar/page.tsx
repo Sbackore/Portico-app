@@ -78,10 +78,17 @@ export default function RecuperarPage() {
       return;
     }
     
-    // No validamos contra el backend todavía, solo pasamos al paso 3 para pedir la nueva contraseña
-    // y enviamos todo junto, o validamos aquí si quisiéramos.
-    // Para simplificar, avanzaremos al paso 3, ya que el endpoint final requiere el código.
-    setPaso(3);
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/verificar-recover-otp', { otpId, codigo: codigoOtp });
+      if (res.data.valido) {
+        setPaso(3);
+      }
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ------------------------------------------------------------

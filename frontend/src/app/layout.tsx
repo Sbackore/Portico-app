@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
 import { Toaster } from 'react-hot-toast';
+import { DynamicGlow } from '@/components/DynamicGlow';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={inter.variable}>
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
+          <DynamicGlow />
           {children}
           <Toaster
             position="top-center"

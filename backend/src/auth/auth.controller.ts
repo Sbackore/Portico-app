@@ -29,6 +29,12 @@ export class AuthController {
     return this.authService.enviarOtpRecuperacion(dto.email);
   }
 
+  @Post('verificar-recover-otp')
+  @HttpCode(200)
+  async verificarRecoverOtp(@Body() dto: { otpId: string; codigo: string }) {
+    return this.authService.verificarOtpRecuperacion(dto.otpId, dto.codigo);
+  }
+
   @Post('reset-password')
   @HttpCode(200)
   async resetPassword(@Body() dto: { otpId: string; codigo: string; newPassword: string }) {

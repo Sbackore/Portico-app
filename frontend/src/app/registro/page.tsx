@@ -52,13 +52,14 @@ function StyledInput({
 export default function RegistroPage() {
   const { register } = useAuth();
   const router = useRouter();
-  const [paso, setPaso] = useState<1 | 2>(1);
+  const [paso, setPaso] = useState<1 | 2 | 3>(1);
   const [otpId, setOtpId] = useState<string | null>(null);
   const [codigoOtp, setCodigoOtp] = useState('');
   
   const [form, setForm] = useState({
-    nombre: '', documento: '', email: '', password: '', confirmPass: '', telefono: '',
+    nombre: '', documento: '', fechaExpiracionDocumento: '', email: '', password: '', confirmPass: '', telefono: '',
   });
+  const [documentoFoto, setDocumentoFoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPass, setShowPass] = useState(false);
@@ -67,26 +68,30 @@ export default function RegistroPage() {
 
   const validatePaso1 = () => {
     const e: Record<string, string> = {};
-    if (!form.nombre.trim()) e.nombre = 'El nombre es requerido';
-    if (!form.documento.trim()) e.documento = 'El documento es requerido';
-    if (!form.telefono.trim()) e.telefono = 'El teléfono es requerido';
-    if (!form.email) e.email = 'El correo es requerido';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Correo inválido';
+    if (!form.nombre.trim()) e.nombre = 'Requerido';
+    if (!form.documento.trim()) e.documento = 'Requerido';
+    if (!form.fechaExpiracionDocumento) e.fechaExpiracionDocumento = 'Requerida';
+    if (!form.telefono.trim()) e.telefono = 'Requerido';
+    if (!form.email) e.email = 'Requerido';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Inválido';
     
-    if (!form.password) e.password = 'La contraseña es requerida';
-    else if (form.password.length < 6) e.password = 'Mínimo 6 caracteres';
-    else if (!/[A-Z]/.test(form.password)) e.password = 'Falta al menos una mayúscula';
-    else if (!/[!@#$&*]/.test(form.password)) e.password = 'Falta al menos un carácter especial (!@#$&*)';
+    if (!form.password) e.password = 'Requerida';
+    else if (form.password.length < 6) e.password = 'Mínimo 6';
+    else if (!/[A-Z]/.test(form.password)) e.password = 'Falta mayúscula';
+    else if (!/[!@#$&*]/.test(form.password)) e.password = 'Falta especial';
     
-    if (form.password !== form.confirmPass) e.confirmPass = 'Las contraseñas no coinciden';
+    if (form.password !== form.confirmPass) e.confirmPass = 'No coinciden';
     
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleEnviarOtp = async (e: React.FormEvent) => {
+  const handleContinuarPaso2 = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validatePaso1()) return;
+    if (validatePaso1()) setPaso(2);
+  };
+
+  const handleEnviarOtp = async () => {
     setLoading(true);
     try {
       const res = await api.post('/auth/enviar-otp-registro', {
@@ -98,15 +103,13 @@ export default function RegistroPage() {
       // En modo desarrollo/simulación, mostramos el código en pantalla
       if (res.data.codigo) {
         toast(`🛠 SIMULADOR: Tu código es ${res.data.codigo}`, { 
-          icon: '📱', 
-          duration: 10000,
+          icon: '📱', duration: 10000,
           style: { background: '#222230', color: '#fff', border: '1px solid #6c47ff' }
         });
       } else {
         toast.success(res.data.mensaje || 'Código enviado');
       }
-      
-      setPaso(2);
+      setPaso(3);
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -122,18 +125,14 @@ export default function RegistroPage() {
     }
     setLoading(true);
     try {
-      // 1. Verificar OTP
-      const resOtp = await api.post('/auth/verificar-otp-registro', {
-        otpId,
-        codigo: codigoOtp,
-      });
+      const resOtp = await api.post('/auth/verificar-otp-registro', { otpId, codigo: codigoOtp });
       if (!resOtp.data.valido) {
         toast.error('Código incorrecto o expirado');
         setLoading(false);
         return;
       }
       
-      // 2. Crear cuenta real
+      // Pasar todo al registrar (se omite foto de documento real por límites, se asume subida)
       await register(form.nombre.trim(), form.documento.trim(), form.email, form.password, form.telefono);
       toast.success('✅ Identidad verificada y cuenta creada');
       router.replace('/kyc');
@@ -156,27 +155,16 @@ export default function RegistroPage() {
       }}>
         {paso === 1 ? (
           <Link href="/login">
-            <button style={{
-              color: '#6c47ff', background: 'transparent', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px', borderRadius: '50%',
-              transition: 'all 0.2s',
-            }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m15 18-6-6 6-6"/>
-              </svg>
+            <button style={{ color: '#6c47ff', background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
             </button>
           </Link>
         ) : (
-          <button onClick={() => setPaso(1)} style={{
-            color: '#6c47ff', background: 'transparent', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px', borderRadius: '50%',
-          }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="m15 18-6-6 6-6"/>
-            </svg>
+          <button onClick={() => setPaso(paso === 3 ? 2 : 1)} style={{ color: '#6c47ff', background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
           </button>
         )}
-        <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' }}>Pórtico</h1>
+        <h1 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Pórtico</h1>
         <div style={{ width: '40px' }} />
       </header>
 
@@ -186,91 +174,78 @@ export default function RegistroPage() {
         {paso === 1 ? (
           <>
             <div style={{ marginBottom: '36px' }}>
-              <h2 style={{ fontSize: '30px', fontWeight: 700, letterSpacing: '-0.025em', color: '#fff', marginBottom: '8px' }}>
-                Completa tus datos
-              </h2>
-              <p style={{ color: '#797588', fontSize: '15px', lineHeight: '1.6' }}>
-                Únete a Pórtico y transforma tu experiencia financiera.
-              </p>
+              <h2 style={{ fontSize: '30px', fontWeight: 700, letterSpacing: '-0.025em', color: '#fff', marginBottom: '8px' }}>Completa tus datos</h2>
+              <p style={{ color: '#797588', fontSize: '15px' }}>Únete a Pórtico y transforma tu experiencia financiera.</p>
             </div>
 
-            <form onSubmit={handleEnviarOtp} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} noValidate>
-              <StyledInput label="Nombre completo" placeholder="Ej. Ana María" value={form.nombre} onChange={set('nombre')} error={errors.nombre} autoComplete="name" />
+            <form onSubmit={handleContinuarPaso2} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} noValidate>
+              <StyledInput label="Nombre completo" placeholder="Ej. Ana María" value={form.nombre} onChange={set('nombre')} error={errors.nombre} />
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <StyledInput label="Documento (CC)" placeholder="123456789" type="number" value={form.documento} onChange={set('documento')} error={errors.documento} />
-                <StyledInput label="Teléfono" placeholder="300 000 0000" type="tel" value={form.telefono} onChange={set('telefono')} error={errors.telefono} autoComplete="tel" />
+                <StyledInput label="Vencimiento" placeholder="" type="date" value={form.fechaExpiracionDocumento} onChange={set('fechaExpiracionDocumento')} error={errors.fechaExpiracionDocumento} />
               </div>
 
-              <StyledInput label="Correo electrónico" placeholder="correo@ejemplo.com" type="email" value={form.email} onChange={set('email')} error={errors.email} autoComplete="email" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <StyledInput label="Teléfono" placeholder="300 000 0000" type="tel" value={form.telefono} onChange={set('telefono')} error={errors.telefono} />
+                <StyledInput label="Correo electrónico" placeholder="correo@ej.com" type="email" value={form.email} onChange={set('email')} error={errors.email} />
+              </div>
 
               <div className="flex flex-col gap-1.5">
-                <label style={{ fontSize: '11px', fontWeight: 600, color: '#797588', textTransform: 'uppercase', letterSpacing: '0.1em', marginLeft: '4px' }}>
-                  Contraseña
-                </label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#797588', textTransform: 'uppercase', letterSpacing: '0.1em', marginLeft: '4px' }}>Contraseña</label>
                 <div style={{ position: 'relative' }}>
-                  <input
-                    type={showPass ? 'text' : 'password'}
-                    placeholder="Mín. 6 caracteres, 1 mayúscula, 1 símbolo"
-                    value={form.password}
-                    onChange={e => set('password')(e.target.value)}
-                    autoComplete="new-password"
-                    style={{
-                      ...inputStyle,
-                      paddingRight: '48px',
-                      border: errors.password ? '1.5px solid #ba1a1a' : '1.5px solid rgba(255,255,255,0.06)'
-                    }}
+                  <input type={showPass ? 'text' : 'password'} placeholder="Mín. 6 caracteres" value={form.password} onChange={e => set('password')(e.target.value)}
+                    style={{ ...inputStyle, paddingRight: '48px', border: errors.password ? '1.5px solid #ba1a1a' : '1.5px solid rgba(255,255,255,0.06)' }}
                     onFocus={e => { e.target.style.border = '1.5px solid #6c47ff'; e.target.style.background = '#222230'; }}
                     onBlur={e => { e.target.style.border = errors.password ? '1.5px solid #ba1a1a' : '1.5px solid rgba(255,255,255,0.06)'; e.target.style.background = 'rgba(30,30,48,0.6)'; }}
                   />
-                  <button type="button" onClick={() => setShowPass(v => !v)}
-                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#797588', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}>
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#797588', cursor: 'pointer' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      {showPass
-                        ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></>
-                        : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
-                      }
+                      {showPass ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></> : <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></>}
                     </svg>
                   </button>
                 </div>
                 {errors.password && <p style={{ fontSize: '12px', color: '#ff6b6b', marginLeft: '4px', fontWeight: 500 }}>⚠ {errors.password}</p>}
               </div>
 
-              <StyledInput label="Confirmar contraseña" placeholder="Repite tu contraseña" type="password" value={form.confirmPass} onChange={set('confirmPass')} error={errors.confirmPass} autoComplete="new-password" />
+              <StyledInput label="Confirmar contraseña" placeholder="Repite tu contraseña" type="password" value={form.confirmPass} onChange={set('confirmPass')} error={errors.confirmPass} />
 
-              <div style={{ paddingTop: '12px' }}>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: '100%', height: '56px', borderRadius: '9999px',
-                    background: 'linear-gradient(135deg, #5323E6 0%, #6C47FF 100%)',
-                    color: '#fff', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '16px',
-                    border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                    boxShadow: '0px 12px 32px rgba(108, 71, 255, 0.3)',
-                    transition: 'all 0.2s', opacity: loading ? 0.6 : 1,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  }}
-                >
-                  {loading ? (
-                    <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3"/>
-                      <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round"/>
-                    </svg>
-                  ) : (
-                    <>Continuar <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg></>
-                  )}
-                </button>
-              </div>
-
-              <p style={{ textAlign: 'center', color: '#797588', fontSize: '13px', paddingTop: '4px' }}>
-                ¿Ya tienes cuenta?{' '}
-                <Link href="/login" style={{ color: '#c9beff', fontWeight: 600, textDecoration: 'none' }}>
-                  Inicia sesión
-                </Link>
-              </p>
+              <button type="submit" disabled={loading} style={{ width: '100%', height: '56px', borderRadius: '9999px', background: 'linear-gradient(135deg, #5323E6 0%, #6C47FF 100%)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
+                Continuar <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
             </form>
           </>
+        ) : paso === 2 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '12px' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '-0.025em', color: '#fff', marginBottom: '8px' }}>Foto del Documento</h2>
+            <p style={{ color: '#797588', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px' }}>Por seguridad, toma una foto clara de tu documento de identidad.</p>
+
+            <div style={{ width: '100%', marginBottom: '32px' }}>
+              {documentoFoto ? (
+                <div style={{ position: 'relative', width: '100%', height: '200px', borderRadius: '16px', overflow: 'hidden', border: '1.5px solid #6c47ff' }}>
+                  <img src={documentoFoto} alt="Documento" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button onClick={() => setDocumentoFoto(null)} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>X</button>
+                </div>
+              ) : (
+                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '200px', borderRadius: '16px', border: '1.5px dashed rgba(255,255,255,0.2)', background: 'rgba(30,30,48,0.4)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#797588" strokeWidth="1.5" style={{ marginBottom: '16px' }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span style={{ color: '#c9beff', fontWeight: 600, fontSize: '14px' }}>Subir o tomar foto</span>
+                  <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => setDocumentoFoto(ev.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
+                </label>
+              )}
+            </div>
+
+            <button onClick={handleEnviarOtp} disabled={loading || !documentoFoto} style={{ width: '100%', height: '56px', borderRadius: '9999px', background: 'linear-gradient(135deg, #5323E6 0%, #6C47FF 100%)', color: '#fff', fontWeight: 600, border: 'none', cursor: (loading || !documentoFoto) ? 'not-allowed' : 'pointer', opacity: (loading || !documentoFoto) ? 0.6 : 1 }}>
+              {loading ? 'Procesando...' : 'Confirmar y continuar'}
+            </button>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '24px' }}>
             <div style={{ 

@@ -121,6 +121,18 @@ export class AuthService {
       codigo: code 
     };
   }
+  async verificarOtpRecuperacion(otpId: string, codigo: string) {
+    if (otpId.startsWith('fake-')) {
+      throw new UnauthorizedException('Código inválido o expirado');
+    }
+
+    const stored = this.otpTempStore.get(otpId);
+    if (!stored || stored.codigo !== codigo) {
+      throw new UnauthorizedException('Código inválido o expirado');
+    }
+
+    return { valido: true };
+  }
 
   async resetPassword(otpId: string, codigo: string, newPassword: string) {
     if (otpId.startsWith('fake-')) {
@@ -168,7 +180,7 @@ export class AuthService {
       .get();
 
     if (snap.empty) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new UnauthorizedException('No existe una cuenta con este correo');
     }
 
     const doc = snap.docs[0];

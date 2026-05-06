@@ -44,16 +44,12 @@ export default function NotificacionesPage() {
   const noLeidas = notis.filter(n => !n.leida).length;
 
   return (
-    <div className="font-body antialiased min-h-screen flex flex-col relative pb-[90px] bg-[#0A0A0F] text-white animate-fade-in">
+    <div className="font-body antialiased min-h-screen flex flex-col relative pb-[90px] bg-transparent text-white animate-fade-in">
       {/* TopAppBar */}
       <header className="bg-[#0A0A0F]/80 backdrop-blur-xl fixed top-0 z-50 shadow-sm shadow-[0px_12px_32px_rgba(108,71,255,0.08)] flex justify-between items-center w-full px-6 py-4 border-b border-white/5">
-        <button className="scale-95 active:scale-90 transition-transform hover:opacity-80">
-          <Menu className="text-white w-7 h-7" />
-        </button>
+        <div className="w-9 h-9" />
         <h1 className="font-headline font-bold text-xl tracking-tight text-white">Notificaciones</h1>
-        <button className="scale-95 active:scale-90 transition-transform hover:opacity-80 w-9 h-9 rounded-full overflow-hidden border-2 border-primary-container/30 flex items-center justify-center bg-slate-800">
-          <UserCircle size={24} className="text-surface-dim" />
-        </button>
+        <div className="w-9 h-9" />
       </header>
 
       {/* Main Content Canvas */}

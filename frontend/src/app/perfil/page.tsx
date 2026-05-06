@@ -1,9 +1,9 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth, getErrorMessage } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/BottomNav';
-import { Button, Input, PageLoader } from '@/components/ui';
+import { Button, Input, PageLoader, Skeleton } from '@/components/ui';
 import {
   Menu, Bell, Mail, Phone, Edit2, LogOut, User, ShieldCheck,
   Lock, ChevronRight, Fingerprint, FileText, HelpCircle,
@@ -25,9 +25,35 @@ export default function PerfilPage() {
   const [notifActivas, setNotifActivas] = useState(
     user?.notificacionesConfig?.permisoNotificacionesActivo ?? true
   );
+  const [dynamicScore, setDynamicScore] = useState<number>(user?.scoreSeguridadCuenta || 100);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchScore = async () => {
+      try {
+        const api = (await import('@/lib/api')).default;
+        const res = await api.get(`/rasp/estado/${user.uid}`);
+        setDynamicScore(res.data.scoreSeguridadCuenta);
+      } catch (err) {
+        // ignore
+      }
+    };
+    fetchScore();
+  }, [user]);
 
   if (!user && !authLoading) { router.replace('/login'); return null; }
-  if (authLoading || !user) return <PageLoader />;
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen pb-32 bg-transparent p-6 max-w-2xl mx-auto flex flex-col gap-6 pt-24">
+        <div className="flex justify-center"><Skeleton className="w-28 h-28 rounded-full" /></div>
+        <div className="flex justify-center"><Skeleton className="w-40 h-8" /></div>
+        <div className="flex gap-2"><Skeleton className="w-1/2 h-12" /><Skeleton className="w-1/2 h-12" /></div>
+        <Skeleton className="w-full h-20" />
+        <Skeleton className="w-full h-20" />
+        <Skeleton className="w-full h-20" />
+      </div>
+    );
+  }
 
   const inicial = user.nombre ? user.nombre[0].toUpperCase() : '?';
 
@@ -66,22 +92,16 @@ export default function PerfilPage() {
     setTimeout(logout, 800);
   };
 
-  const scoreColor = user.scoreSeguridadCuenta >= 70 ? 'text-[#00FF85]' : user.scoreSeguridadCuenta >= 40 ? 'text-orange-400' : 'text-error';
-  const scoreBg = user.scoreSeguridadCuenta >= 70 ? 'bg-[#00FF85]/10 border-[#00FF85]/30' : user.scoreSeguridadCuenta >= 40 ? 'bg-orange-500/10 border-orange-500/30' : 'bg-error/10 border-error/30';
+  const scoreColor = dynamicScore >= 70 ? 'text-[#00FF85]' : dynamicScore >= 40 ? 'text-orange-400' : 'text-error';
+  const scoreBg = dynamicScore >= 70 ? 'bg-[#00FF85]/10 border-[#00FF85]/30' : dynamicScore >= 40 ? 'bg-orange-500/10 border-orange-500/30' : 'bg-error/10 border-error/30';
 
   return (
-    <div className="min-h-screen pb-32 animate-fade-in bg-[#0A0A0F] text-white font-body">
+    <div className="min-h-screen pb-32 animate-fade-in bg-transparent text-white font-body">
       {/* TopAppBar */}
       <header className="fixed top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(108,71,255,0.08)] flex items-center justify-between px-6 py-4 w-full border-b border-white/5">
-        <button className="active:scale-95 transition-transform duration-200 p-1">
-          <Menu className="text-surface-dim w-7 h-7" />
-        </button>
+        <div className="w-9 h-9" />
         <h1 className="font-headline tracking-tighter font-bold text-xl text-white">Mi cuenta</h1>
-        <Link href="/notificaciones">
-          <button className="active:scale-95 transition-transform duration-200 p-1">
-            <Bell className="text-surface-dim w-7 h-7" />
-          </button>
-        </Link>
+        <div className="w-9 h-9" />
       </header>
 
       <main className="flex-grow flex flex-col px-6 pt-24 pb-12 gap-6 max-w-2xl mx-auto w-full">
@@ -173,10 +193,10 @@ export default function PerfilPage() {
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Score de Seguridad</span>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`font-bold text-lg ${scoreColor}`}>{user.scoreSeguridadCuenta}</span>
+                        <span className={`font-bold text-lg ${scoreColor}`}>{dynamicScore}</span>
                         <span className="text-surface-dim text-sm">/ 100</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${scoreBg} ${scoreColor}`}>
-                          {user.scoreSeguridadCuenta >= 70 ? 'Protegida' : user.scoreSeguridadCuenta >= 40 ? 'En riesgo' : 'Crítico'}
+                          {dynamicScore >= 70 ? 'Protegida' : dynamicScore >= 40 ? 'En riesgo' : 'Crítico'}
                         </span>
                       </div>
                     </div>

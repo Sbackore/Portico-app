@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -28,7 +29,9 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      const msg = getErrorMessage(err);
+      setGlobalError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -70,6 +73,18 @@ export default function LoginPage() {
             Ingresa tus credenciales para acceder a tu cuenta protegida.
           </p>
         </section>
+
+        {/* Global Error Banner */}
+        {globalError && (
+          <div className="mb-6 p-4 rounded-2xl bg-error/10 border border-error/30 flex flex-col items-center text-center animate-fade-in">
+            <p className="text-sm font-semibold text-error mb-2">{globalError}</p>
+            {globalError === 'No existe una cuenta con este correo' && (
+              <Link href="/registro" className="inline-flex items-center justify-center h-10 px-6 rounded-full bg-error text-white text-sm font-semibold hover:bg-error/90 transition-colors shadow-lg active:scale-95">
+                Regístrate aquí
+              </Link>
+            )}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
